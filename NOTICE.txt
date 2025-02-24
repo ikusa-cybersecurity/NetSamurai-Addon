@@ -1,0 +1,14 @@
+This project contains portions of code that were originally licensed under the Apache License, Version 2.0.  
+These portions have been modified and are now part of the GPL-3.0-or-later-licensed project.  
+
+The following files include code originally under Apache 2.0:  
+- `source/background.js`  
+- `source/popup/popup.js`  
+- `source/popup/popup.html`  
+
+While the original Apache 2.0 license notice has been replaced with a combined SPDX header,  
+we acknowledge the original authors.  
+
+For reference, the full Apache License 2.0 text can be found here:  
+https://www.apache.org/licenses/LICENSE-2.0  
+

@@ -1,0 +1,6 @@
+# Plugin build files
+make_plugin.sh
+plugin.xpi
+
+# macOS files
+.DS_Store

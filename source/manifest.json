@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "GuardXP",
+  "version": "1.0.0",
+
+  "description": "Block and replace tracking code from your everyday browsing activities.",
+  "homepage_url": "https://eprivo.eu/",
+
+  "permissions": ["webRequest","webRequestBlocking","<all_urls>", "storage", "tabs", "cookies"],
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
+  "browser_action": {
+     "default_icon": "icons/icon.png",
+     "default_popup": "popup/popup.html"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "guardxp@eprivo.eu",
+      "strict_min_version": "59.0"
+    }
+  },
+
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

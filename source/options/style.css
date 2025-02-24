@@ -1,0 +1,26 @@
+* {
+    color: white;
+    font-family: system-ui, Roboto;
+}
+
+body {
+    background-color: #545454;
+}
+
+hr {
+    height: 2px;
+    border-width: 0;
+    color: gray;
+    background-color: gray
+}
+
+.container {
+    width: 60%;
+    margin: 5% auto;
+    background-color: #4c4c4c;
+    padding: 20px;
+}
+
+.container2 {
+    margin-left: 45px;
+}
