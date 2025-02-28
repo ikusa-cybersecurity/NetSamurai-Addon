@@ -6,6 +6,7 @@
  *
  * - Original portions: Copyright (C) 2020 Universitat Politècnica de Catalunya – Licensed under Apache 2.0
  * - Modifications: Copyright (C) 2025 ePrivo Observatory  – Licensed under GPL-3.0-or-later
+ * - Modifications: Copyright (C) 2025 Ikusa Cybersecurity  – Licensed under GPL-3.0-or-later
  *
  * You may choose to follow either license when using this file.
  *
@@ -221,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("home_container").style.display = "block";
     });
     document.getElementById("api_button").addEventListener("click", function() {
-        browser.tabs.create({url: "https://eprivo.eu/"});
+        browser.tabs.create({url: "https://ikusa.tech/"});
     });
     document.getElementById("settings_button").addEventListener("click", function() {
         browser.runtime.sendMessage({method:'options_page'}, function(response){});

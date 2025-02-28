@@ -1,10 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "GuardXP",
-  "version": "1.0.0",
+  "name": "NetSamurai",
+  "version": "1.0.1",
 
-  "description": "Block and replace tracking code from your everyday browsing activities.",
-  "homepage_url": "https://eprivo.eu/",
+  "description": "Block tracking code shared accross multiple resources.",
+  "homepage_url": "https://ikusa.tech/",
 
   "permissions": ["webRequest","webRequestBlocking","<all_urls>", "storage", "tabs", "cookies"],
 
@@ -17,8 +17,7 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "guardxp@eprivo.eu",
-      "strict_min_version": "59.0"
+      "id": "netsamurai@ikusa.tech"
     }
   },
 

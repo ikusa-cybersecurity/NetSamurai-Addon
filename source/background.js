@@ -6,6 +6,7 @@
  *
  * - Original portions: Copyright (C) 2020 Universitat Politècnica de Catalunya – Licensed under Apache 2.0
  * - Modifications: Copyright (C) 2025 ePrivo Observatory  – Licensed under GPL-3.0-or-later
+ * - Modifications: Copyright (C) 2025 Ikusa Cybersecurity  – Licensed under GPL-3.0-or-later
  *
  * You may choose to follow either license when using this file.
  *
@@ -28,7 +29,7 @@ let syncWhitelist = false; // Has to be marked as true to sync whitelist with lo
 let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
 
 // ============== REPOs PATHS ==============
-const offsetHashlistPath = "https://raw.githubusercontent.com/CBA-UPC/GuardXP-Plugin/main/offsets/offsets.json"
+const offsetHashlistPath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/main/offsets/offsets.json"
 const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
 // ============== OTHER ==============
@@ -337,7 +338,7 @@ browser.webRequest.onBeforeRequest.addListener(
                     new_data = cleanResourceOffsets(originalDataView, replacementEntry["parts"]);
                 }
 
-                console.debug(details.url + " blocked and replaced by guardxp");
+                console.debug(details.url + " blocked and replaced by netsamurai");
                 console.debug("(Replaced: " + hash + " | size " + originalDataView.length + " -> " + new_data.length + " )");
 
                 // Add info to tabInfo
