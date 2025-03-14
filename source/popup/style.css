@@ -235,9 +235,10 @@ input:checked + .slider:after {
     height: 18px;
     background-color: #444546;
     /*margin: 0 1px;*/
-    margin-bottom: 5px;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-bottom: 2px;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: inline-block;
 }
 
 .change-opacity {
@@ -249,13 +250,8 @@ input:checked + .slider:after {
     opacity: 0.9;
 }
 
-.buttons-cell-left {
-    width: 200px;
-    text-align: left;
-}
-
-.buttons-cell-right {
-    width: 100px;
+.buttons-cell {
+    width: 300px;
     text-align: center;
     align-items: center;
 }
@@ -282,10 +278,6 @@ input:checked + .slider:after {
     padding-bottom: 5px;
     padding-top: 5px;
     border-top: 2px solid #5F5F5F;
-}
-
-.api-button {
-    background-image: url('../icons/buttons/api_64.png')
 }
 
 .home-button {
