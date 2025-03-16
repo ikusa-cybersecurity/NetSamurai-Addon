@@ -20,7 +20,6 @@ let filter = true; // Boolean that indicates if extension's filter is activated 
 let tabsInfo = new Map(); //Info about current open tabs will be handled in this variable
 
 // ============== LIST MANAGEMENT ==============
-let defaultWhitelist = ["recaptcha"]; // Whitelisted elements to avoid some false positives that affect some websites functionality
 let globalWhitelist = [];
 let offsetHashlist = {};
 let localHashSum = "";
@@ -51,7 +50,7 @@ if (cookieDBEnabled) loadTrackingCookiesDB();
 async function loadWhitelist(){
     globalWhitelist = (await browser.storage.local.get("globalWhitelist")).globalWhitelist;
     if (globalWhitelist === undefined) {
-        globalWhitelist = defaultWhitelist;
+        globalWhitelist = [];
         // console.debug("[whitelist] Initializing whitelist...");
         browser.storage.local.set({globalWhitelist});
     }
@@ -86,6 +85,53 @@ async function loadTrackingCookiesDB() {
         }
     }
     console.log("Loaded tracking cookie list from Open Cookie Database.");
+}
+
+
+// ########################################## REGEX LISTS ##########################################
+
+// Regex for patterns related to paywalls and banners
+const rePaywalls = new RegExp(
+    [
+        "^https?:\\/\\/sdk\\.privacy-center\\.org\\/.*\\.js$",
+        "^https?:\\/\\/s1\\.elespanol\\.com\\/eprivacy\\/sdk\\/.*\\.js$",
+        "^https?:\\/\\/app\\.usercentrics\\.eu\\/.*\\.js$",
+        "^https?:\\/\\/.*gdpr.*\\.js$",
+        "^https?:\\/\\/cdn\\.privacy-mgmt\\.com\\/.*\\.js$",
+        "^https?:\\/\\/app\\.termly\\.io\\/.*\\.js$",
+        "^https?:\\/\\/cdn\\.appconsent\\.io\\/.*\\.js$",
+        "^https?:\\/\\/pagead2\\.googlesyndication\\.com\\/.*\\.js$",
+        "^https?:\\/\\/choices\\.consentframework\\.com\\/.*$",
+        "^https?:\\/\\/consent\\.lexpress\\.fr\\/.*$",
+        "^https?:\\/\\/cmp\\..*$",
+        "^https?:\\/\\/cdn-gl\\.imrworldwide\\.com\\/.*$",
+        "^https?:\\/\\/tlh\\.gedidigital\\.it\\/.*$",
+        "^https?:\\/\\/.*iabtfc.*$",
+        "^https?:\\/\\/utils\\.cedsdigital\\.it\\/.*\\.js$",
+        "^https?:\\/\\/.*tcf-v.*$",
+        "^https?:\\/\\/cdn\\.cookielaw\\.org\\/.*$",
+        "^https?:\\/\\/clickiocmp\\.com\\/.*$"
+    ].join("|")
+);
+
+function isPaywall(url) {
+    return rePaywalls.test(url);
+}
+
+// Regex for resources that cause website functionality breakage
+const reUnbreak = new RegExp(
+    [
+        // jQuery
+        "^https?:\\/\\/[^\\/]+\\/.*\\/jquery.*\\.js$",
+        // reCAPTCHA
+        "^https?:\\/\\/(www\\.)?(google\\.com|recaptcha\\.net|gstatic\\.com)\\/.*recaptcha.*",
+        // gstatic
+        "^https?:\\/\\/([a-z0-9.-]+\\.)?gstatic\\.com\\/.*$"
+    ].join("|")
+);
+
+function isUnbreak(url) {
+    return reUnbreak.test(url);
 }
 
 
@@ -275,6 +321,11 @@ browser.webRequest.onBeforeRequest.addListener(
         // let tabHost = tabsInfo.get(idTab).host;
         let tabBaseHost = tabsInfo.get(idTab).baseHost;
 
+        // Check if the resource is in the unbreak list
+        if (isUnbreak(auxURL.href)) {
+            console.debug("Allowed by unbreak list: " + request_url);
+            return;
+        }
         // Check if there's changes to the global whitelist and has to be synchronized with storage
         if (syncWhitelist) {
             browser.storage.local.set({globalWhitelist});
@@ -298,6 +349,11 @@ browser.webRequest.onBeforeRequest.addListener(
                 console.debug("Allowed by tab whitelist: " + request_url);
                 return;
             }
+        }
+        // Check if the resource is identified as paywall or comes from paywall providers 
+        if (isPaywall(auxURL.href)) {
+            console.log(auxURL.href + " blocked due to paywall restrictions!");
+            return {cancel: true};
         }
         // Check if the resource has to be blocked due to spamming
         let auxHardBlockList = tabsInfo.get(idTab).hardBlockList;

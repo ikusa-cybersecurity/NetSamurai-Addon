@@ -65,9 +65,10 @@ function createHostUrlStructure(hostname, data) {
     hostnameHeading.textContent = truncateDomain(hostname);
     let hostnameResourceAmount = 0;
 
-    const createButton = (className, messageMethods) => {
+    const createButton = (className, buttonTitle, messageMethods) => {
         const button = document.createElement('button');
         button.classList.add("image-button", "small-button", "change-opacity", className);
+        button.title = buttonTitle;
         button.addEventListener('click', () => {
             for (messageMethod of messageMethods) {
                 browser.runtime.sendMessage({ method: messageMethod, data: hostname });
@@ -77,20 +78,14 @@ function createHostUrlStructure(hostname, data) {
         return button;
     };
 
-
-    const buttonsCellLeft = document.createElement("td");
-    buttonsCellLeft.textContent = "Domain whitelist options";
-    buttonsCellLeft.className = "buttons-cell-left"
-
-    const buttonsCellRight = document.createElement("td");
-    buttonsCellRight.appendChild(createButton("del-whitelist-button", ["remove_from_whitelist", "remove_from_tmp_whitelist"]));
-    buttonsCellRight.appendChild(createButton("add-whitelist-button", ["add_to_whitelist"]));
-    buttonsCellRight.appendChild(createButton("tmp-whitelist-button", ["add_to_tmp_whitelist"]));
-    buttonsCellRight.className = "buttons-cell-right"
+    const buttonsCell = document.createElement("td");
+    buttonsCell.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist"]));
+    buttonsCell.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist"]));
+    buttonsCell.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist"]));
+    buttonsCell.className = "buttons-cell"
 
     const buttonsRow = document.createElement("tr");
-    buttonsRow.appendChild(buttonsCellLeft);
-    buttonsRow.appendChild(buttonsCellRight);
+    buttonsRow.appendChild(buttonsCell);
 
     const buttonsTable = document.createElement("table");
     buttonsTable.appendChild(buttonsRow);
@@ -219,9 +214,6 @@ document.addEventListener('DOMContentLoaded', function () {
     checkEnabled();
 
     document.getElementById("home_button").addEventListener("click", function () {
-        document.getElementById("home_container").style.display = "block";
-    });
-    document.getElementById("api_button").addEventListener("click", function() {
         browser.tabs.create({url: "https://ikusa.tech/"});
     });
     document.getElementById("settings_button").addEventListener("click", function() {
