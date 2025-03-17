@@ -121,12 +121,10 @@ function isPaywall(url) {
 // Regex for resources that cause website functionality breakage
 const reUnbreak = new RegExp(
     [
-        // jQuery
-        "^https?:\\/\\/[^\\/]+\\/.*\\/jquery.*\\.js$",
-        // reCAPTCHA
-        "^https?:\\/\\/(www\\.)?(google\\.com|recaptcha\\.net|gstatic\\.com)\\/.*recaptcha.*",
-        // gstatic
-        "^https?:\\/\\/([a-z0-9.-]+\\.)?gstatic\\.com\\/.*$"
+        "^https?:\\/\\/[^\\/]+\\/.*\\/jquery.*\\.js$", // jQuery
+        "^https?:\\/\\/(www\\.)?(google\\.com|recaptcha\\.net|gstatic\\.com)\\/.*recaptcha.*", // reCAPTCHA
+        "^https?:\\/\\/([a-z0-9.-]+\\.)?gstatic\\.com\\/.*$", // gstatic
+        "^https?:\\/\\/docs\\.google\\.com\\/.*" // Docs
     ].join("|")
 );
 
