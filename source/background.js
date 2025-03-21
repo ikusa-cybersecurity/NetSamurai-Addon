@@ -24,7 +24,7 @@ let trackingCookies = [] // Extracted from the Open Cookie Database
 let hardBlockThreshold = 3
 
 // ============== REMOTE PATHS ==============
-const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/feature/lists/" // TODO: update to main branch when merging
+const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/development/" // TODO: update to main branch when merging
 const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
 // ============== LIST/RULES MANAGEMENT ==============
@@ -423,8 +423,9 @@ browser.webRequest.onBeforeRequest.addListener(
                     new_data = cleanResourceOffsets(originalDataView, replacementEntry["parts"]);
                 }
 
-                console.debug(details.url + " blocked and replaced by netsamurai");
-                console.debug("(Replaced: " + hash + " | size " + originalDataView.length + " -> " + new_data.length + " )");
+                console.debug(details.url + " cleaned by netsamurai");
+                // TODO: Check why so many new_data.legth come as undefined despite the algorithm working
+                //console.debug("(Replaced: " + hash + " | size " + originalDataView.length + " -> " + new_data.length + " )");
 
                 // Add info to tabInfo
                 let auxURL = await new URL(request_url);
