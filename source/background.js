@@ -19,61 +19,126 @@
 let filter = true; // Boolean that indicates if extension's filter is activated or not
 let tabsInfo = new Map(); //Info about current open tabs will be handled in this variable
 
-// ============== LIST MANAGEMENT ==============
-let globalWhitelist = [];
-let offsetHashlist = {};
-let localHashSum = "";
-let remoteHashSum = "";
-let syncWhitelist = false; // Has to be marked as true to sync whitelist with local storage
-let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
-
-// ============== REPOs PATHS ==============
-const offsetHashlistPath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/main/offsets/offsets.json"
-const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
-
-// ============== OTHER ==============
 const cookieDBEnabled = true;
 let trackingCookies = [] // Extracted from the Open Cookie Database
 let hardBlockThreshold = 3
 
+// ============== REMOTE PATHS ==============
+const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/feature/lists" // TODO: update to main branch when merging
+const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
+// ============== LIST/RULES MANAGEMENT ==============
+let globalWhitelist = [];
+let syncWhitelist = false; // Has to be marked as true to sync whitelist with local storage
+let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
+
+let offsetHashlist = {};
+
+const unbreakRulesActive = true;
+let reUnbreakRules; // RegExp
+
+const paywallRulesActive = true;
+let rePaywallRules; // RegExp
+
+// #################### ADDON INITIALIZATION ####################
+loadWhitelist();  // User managed whitelist
+updateOffsetHashlist();
+if (unbreakRulesActive) updateUnbreakRules();
+if (paywallRulesActive) updatePaywallRules();
+if (cookieDBEnabled) loadTrackingCookiesDB();
 //change badge color (badge shows the number of suspicious url blocked on a website)
 browser.browserAction.setBadgeBackgroundColor({color:'#cf1b1b'});
 
-loadOffsetHashlist();
-loadWhitelist();
-if (cookieDBEnabled) loadTrackingCookiesDB();
 
+// ############################################## UPDATE LISTS/RULES ##############################################
+async function getRemoteList(list_url, storage_var) {
+    try {
+        // Get local hash from storage
+        let localHashVar = storage_var + "Hash";
+        let localHash = (await browser.storage.local.get(localHashVar))[localHashVar];
+        // Try to get remote hash
+        let remoteHash;
+        try {
+            remoteHash = await (await fetch(list_url + ".sha256")).text();
+        } catch (e) {
+            console.error(`Error fetching hash for ${storage_var}:`, e);
+            // If we can't get the remote hash, use existing data if available
+            if (localHash !== undefined) {
+                return (await browser.storage.local.get(storage_var))[storage_var];
+            }
+            // If no existing data, throw error to trigger fallback
+            throw e;
+        }
+        // Update if no local data stored or if newer data is available
+        if (localHash === undefined || localHash !== remoteHash) {
+            console.debug(`${storage_var} local  : ${localHash}`);
+            console.debug(`${storage_var} remote : ${remoteHash}`);
+            try {
+                let response = await fetch(list_url);
+                let json_response = await response.json();
+                // Store data
+                isRegexRules = storage_var.toLowerCase().includes('rules')
+                storage_data = isRegexRules ? json_response.rules : json_response;
+                let storageObj = {};
+                storageObj[storage_var] = storage_data;
+                await browser.storage.local.set(storageObj);
+                // Store hash
+                let hashObj = {};
+                hashObj[localHashVar] = remoteHash;
+                await browser.storage.local.set(hashObj);
 
-// ############################################## WHITELIST FUNCTIONS ##############################################
-// purpose of this is to avoid false positive that affects website usability and correct functioning
-async function loadWhitelist(){
-    globalWhitelist = (await browser.storage.local.get("globalWhitelist")).globalWhitelist;
-    if (globalWhitelist === undefined) {
-        globalWhitelist = [];
-        // console.debug("[whitelist] Initializing whitelist...");
-        browser.storage.local.set({globalWhitelist});
+                console.debug(`${storage_var} updated!`);
+                return json_response;
+            } catch (e) {
+                console.error(`Error fetching data for ${storage_var}:`, e);
+                // If fetch fails but we have existing data, use it
+                if (localHash !== undefined) {
+                    console.error(`Loading stored content for ${storage_var}:`, e);
+                    return (await browser.storage.local.get(storage_var))[storage_var];
+                }
+                // If no existing data, throw error to trigger fallback
+                throw e;
+            }
+        }
+        else {
+            // Return existing data from storage
+            console.debug(`${storage_var} already up to date!`);
+            return (await browser.storage.local.get(storage_var))[storage_var];
+        }
+    } catch (e) {
+        console.error(`Error loading ${storage_var}:`, e);
+        // Return null to indicate failure, allowing caller to handle fallback
+        return null;
     }
 }
 
-
-// ############################################## INIT FUNCTIONS ##############################################
-async function loadOffsetHashlist() {
-    localHashSum = (await browser.storage.local.get("localHashSum")).localHashSum;
-    remoteHashSum = await (await fetch(offsetHashlistPath + ".sha256")).text();
-    console.debug("localHashSum  : " + localHashSum);
-    console.debug("remoteHashSum : " + remoteHashSum);
-    if (localHashSum === undefined || localHashSum !== remoteHashSum) {
-        let response = await fetch(offsetHashlistPath);
-        let json_response = await response.json();
-        offsetHashlist = json_response
-        browser.storage.local.set({offsetHashlist});
-        localHashSum = remoteHashSum;
-        browser.storage.local.set({localHashSum});
-        console.debug("offsetHashlist updated!");
+async function updateOffsetHashlist() {
+    offsetHashlist = await getRemoteList(remoteBasePath + "lists/offsets/offsets.json", "offsetHashlist");
+    if (offsetHashlist === null) {
+        console.error("Failed to load offsetHashlist! loaded empty list.");
+        offsetHashlist = {};
     }
-    else offsetHashlist = (await browser.storage.local.get("offsetHashlist")).offsetHashlist;
 }
+
+async function updatePaywallRules() {
+    let rules = await getRemoteList(remoteBasePath + "lists/rules/paywalls.json", "paywallRules");
+    if (rules === null) {
+        console.error("Failed to load paywallRules! paywallRules disabled.");
+    } else {
+        rePaywallRules = new RegExp(rules.join("|"));
+    }
+}
+function isPaywall(url) { return rePaywallRules.test(url); }
+
+async function updateUnbreakRules() {
+    let rules = await getRemoteList(remoteBasePath + "lists/rules/unbreak.json", "unbreakRules");
+    if (rules === null) {
+        console.error("Failed to load unbreakRules! unbreakRules disabled.");
+    } else {
+        reUnbreakRules = new RegExp(rules.join("|"));
+    }
+}
+function isUnbreak(url) { return reUnbreakRules.test(url); }
 
 async function loadTrackingCookiesDB() {
     let response = await fetch(openCookieDBPath);
@@ -88,48 +153,14 @@ async function loadTrackingCookiesDB() {
 }
 
 
-// ########################################## REGEX LISTS ##########################################
-
-// Regex for patterns related to paywalls and banners
-const rePaywalls = new RegExp(
-    [
-        "^https?:\\/\\/sdk\\.privacy-center\\.org\\/.*\\.js$",
-        "^https?:\\/\\/s1\\.elespanol\\.com\\/eprivacy\\/sdk\\/.*\\.js$",
-        "^https?:\\/\\/app\\.usercentrics\\.eu\\/.*\\.js$",
-        "^https?:\\/\\/.*gdpr.*\\.js$",
-        "^https?:\\/\\/cdn\\.privacy-mgmt\\.com\\/.*\\.js$",
-        "^https?:\\/\\/app\\.termly\\.io\\/.*\\.js$",
-        "^https?:\\/\\/cdn\\.appconsent\\.io\\/.*\\.js$",
-        "^https?:\\/\\/pagead2\\.googlesyndication\\.com\\/.*\\.js$",
-        "^https?:\\/\\/choices\\.consentframework\\.com\\/.*$",
-        "^https?:\\/\\/consent\\.lexpress\\.fr\\/.*$",
-        "^https?:\\/\\/cmp\\..*$",
-        "^https?:\\/\\/cdn-gl\\.imrworldwide\\.com\\/.*$",
-        "^https?:\\/\\/tlh\\.gedidigital\\.it\\/.*$",
-        "^https?:\\/\\/.*iabtfc.*$",
-        "^https?:\\/\\/utils\\.cedsdigital\\.it\\/.*\\.js$",
-        "^https?:\\/\\/.*tcf-v.*$",
-        "^https?:\\/\\/cdn\\.cookielaw\\.org\\/.*$",
-        "^https?:\\/\\/clickiocmp\\.com\\/.*$"
-    ].join("|")
-);
-
-function isPaywall(url) {
-    return rePaywalls.test(url);
-}
-
-// Regex for resources that cause website functionality breakage
-const reUnbreak = new RegExp(
-    [
-        "^https?:\\/\\/[^\\/]+\\/.*\\/jquery.*\\.js$", // jQuery
-        "^https?:\\/\\/(www\\.)?(google\\.com|recaptcha\\.net|gstatic\\.com)\\/.*recaptcha.*", // reCAPTCHA
-        "^https?:\\/\\/([a-z0-9.-]+\\.)?gstatic\\.com\\/.*$", // gstatic
-        "^https?:\\/\\/docs\\.google\\.com\\/.*" // Docs
-    ].join("|")
-);
-
-function isUnbreak(url) {
-    return reUnbreak.test(url);
+// ############################################## USER WHITELIST FUNCTIONS ##############################################
+async function loadWhitelist(){
+    globalWhitelist = (await browser.storage.local.get("globalWhitelist")).globalWhitelist;
+    if (globalWhitelist === undefined) {
+        globalWhitelist = [];
+        // console.debug("[whitelist] Initializing whitelist...");
+        browser.storage.local.set({globalWhitelist});
+    }
 }
 
 
@@ -320,7 +351,7 @@ browser.webRequest.onBeforeRequest.addListener(
         let tabBaseHost = tabsInfo.get(idTab).baseHost;
 
         // Check if the resource is in the unbreak list
-        if (isUnbreak(auxURL.href)) {
+        if (unbreakRulesActive && isUnbreak(auxURL.href)) {
             console.debug("Allowed by unbreak list: " + request_url);
             return;
         }
@@ -349,7 +380,7 @@ browser.webRequest.onBeforeRequest.addListener(
             }
         }
         // Check if the resource is identified as paywall or comes from paywall providers 
-        if (isPaywall(auxURL.href)) {
+        if (paywallRulesActive && isPaywall(auxURL.href)) {
             console.log(auxURL.href + " blocked due to paywall restrictions!");
             return {cancel: true};
         }

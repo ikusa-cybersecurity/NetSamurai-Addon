@@ -1,0 +1,22 @@
+{
+    "rules": [
+        "^https?:\\/\\/sdk\\.privacy-center\\.org\\/.*\\.js$",
+        "^https?:\\/\\/s1\\.elespanol\\.com\\/eprivacy\\/sdk\\/.*\\.js$",
+        "^https?:\\/\\/app\\.usercentrics\\.eu\\/.*\\.js$",
+        "^https?:\\/\\/.*gdpr.*\\.js$",
+        "^https?:\\/\\/cdn\\.privacy-mgmt\\.com\\/.*\\.js$",
+        "^https?:\\/\\/app\\.termly\\.io\\/.*\\.js$",
+        "^https?:\\/\\/cdn\\.appconsent\\.io\\/.*\\.js$",
+        "^https?:\\/\\/pagead2\\.googlesyndication\\.com\\/.*\\.js$",
+        "^https?:\\/\\/choices\\.consentframework\\.com\\/.*$",
+        "^https?:\\/\\/consent\\.lexpress\\.fr\\/.*$",
+        "^https?:\\/\\/cmp\\..*$",
+        "^https?:\\/\\/cdn-gl\\.imrworldwide\\.com\\/.*$",
+        "^https?:\\/\\/tlh\\.gedidigital\\.it\\/.*$",
+        "^https?:\\/\\/.*iabtfc.*$",
+        "^https?:\\/\\/utils\\.cedsdigital\\.it\\/.*\\.js$",
+        "^https?:\\/\\/.*tcf-v.*$",
+        "^https?:\\/\\/cdn\\.cookielaw\\.org\\/.*$",
+        "^https?:\\/\\/clickiocmp\\.com\\/.*$"
+    ]
+}
