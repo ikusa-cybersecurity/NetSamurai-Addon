@@ -41,13 +41,27 @@ const paywallRulesActive = true;
 let rePaywallRules; // RegExp
 
 // #################### ADDON INITIALIZATION ####################
-loadWhitelist();  // User managed whitelist
-updateOffsetHashlist();
-if (unbreakRulesActive) updateUnbreakRules();
-if (paywallRulesActive) updatePaywallRules();
-if (cookieDBEnabled) loadTrackingCookiesDB();
-//change badge color (badge shows the number of suspicious url blocked on a website)
-browser.browserAction.setBadgeBackgroundColor({color:'#cf1b1b'});
+async function initializeAddon() {
+    try {
+        await loadWhitelist();
+        await updateOffsetHashlist();
+        if (unbreakRulesActive) {
+            await updateUnbreakRules();
+        }
+        if (paywallRulesActive) {
+            await updatePaywallRules();
+        }
+        if (cookieDBEnabled) {
+            await loadTrackingCookiesDB();
+        }
+        console.debug("Addon initialization completed successfully");
+    } catch (e) {
+        console.error("Error during addon initialization:", e);
+    }
+}
+
+initializeAddon();
+browser.browserAction.setBadgeBackgroundColor({color:'#cf1b1b'}); // Badge color (# cleaned urls)
 
 
 // ############################################## UPDATE LISTS/RULES ##############################################
@@ -121,21 +135,21 @@ async function updateOffsetHashlist() {
 }
 
 async function updatePaywallRules() {
-    let rules = await getRemoteList(remoteBasePath + "lists/rules/paywalls.json", "paywallRules");
-    if (rules === null) {
+    let rawPaywallRules = await getRemoteList(remoteBasePath + "lists/rules/paywalls.json", "paywallRules");
+    if (rawPaywallRules === null) {
         console.error("Failed to load paywallRules! paywallRules disabled.");
     } else {
-        rePaywallRules = new RegExp(rules.join("|"));
+        rePaywallRules = new RegExp(rawPaywallRules.join("|"));
     }
 }
 function isPaywall(url) { return rePaywallRules.test(url); }
 
 async function updateUnbreakRules() {
-    let rules = await getRemoteList(remoteBasePath + "lists/rules/unbreak.json", "unbreakRules");
-    if (rules === null) {
+    let rawUnbreakRules = await getRemoteList(remoteBasePath + "lists/rules/unbreak.json", "unbreakRules");
+    if (rawUnbreakRules === null) {
         console.error("Failed to load unbreakRules! unbreakRules disabled.");
     } else {
-        reUnbreakRules = new RegExp(rules.join("|"));
+        reUnbreakRules = new RegExp(rawUnbreakRules.join("|"));
     }
 }
 function isUnbreak(url) { return reUnbreakRules.test(url); }
