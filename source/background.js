@@ -24,7 +24,7 @@ let trackingCookies = [] // Extracted from the Open Cookie Database
 let hardBlockThreshold = 3
 
 // ============== REMOTE PATHS ==============
-const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/feature/lists" // TODO: update to main branch when merging
+const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/feature/lists/" // TODO: update to main branch when merging
 const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
 // ============== LIST/RULES MANAGEMENT ==============
@@ -88,12 +88,12 @@ async function getRemoteList(list_url, storage_var) {
                 await browser.storage.local.set(hashObj);
 
                 console.debug(`${storage_var} updated!`);
-                return json_response;
+                return storage_data;
             } catch (e) {
                 console.error(`Error fetching data for ${storage_var}:`, e);
                 // If fetch fails but we have existing data, use it
                 if (localHash !== undefined) {
-                    console.error(`Loading stored content for ${storage_var}:`, e);
+                    console.warn(`Loading stored content for ${storage_var}:`, e);
                     return (await browser.storage.local.get(storage_var))[storage_var];
                 }
                 // If no existing data, throw error to trigger fallback
