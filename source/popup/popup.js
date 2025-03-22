@@ -224,6 +224,20 @@ document.addEventListener('DOMContentLoaded', function () {
         browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
         window.close();
     });
+    document.getElementById("report_button").addEventListener("click", function() {
+        browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            let currentUrl = encodeURIComponent(tabs[0].url);
+            let subject = encodeURIComponent("[NetSamurai-Addon] Report Broken Website");
+            let body = encodeURIComponent(`Broken Website URL: ${currentUrl}\n\nPlease describe the issue:\n`);
+            let mailtoUrl = `mailto:info@ikusa.tech?subject=${subject}&body=${body}`;
+            console.debug(`Triggered broken website report - ${mailtoUrl}`);
+            browser.tabs.create({url: mailtoUrl});
+        });
+    });
+    document.getElementById("cleanurls_button").addEventListener("click", function() {
+        // browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
+        // window.close();
+    });
 });
 
 renderPopup();

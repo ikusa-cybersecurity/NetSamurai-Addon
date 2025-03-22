@@ -216,17 +216,17 @@ input:checked + .slider:after {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 7px 0;
+    margin: 10px 5px 8px 5px;
 }
 
 .image-button {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border: none;
     cursor: pointer;
     background-color: #3A3B3C;
-    margin: 0 5px;
+    margin: 0 6px;
     background-size: cover;
 }
 
@@ -290,6 +290,14 @@ input:checked + .slider:after {
 
 .settings-button {
     background-image: url('../icons/buttons/settings_64.png');
+}
+
+.report-button {
+    background-image: url('../icons/buttons/report_64.png');
+}
+
+.cleanurls-button {
+    background-image: url('../icons/buttons/cleanurls_64.png');
 }
 
 .add-whitelist-button {
