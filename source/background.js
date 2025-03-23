@@ -24,7 +24,7 @@ let trackingCookies = [] // Extracted from the Open Cookie Database
 let hardBlockThreshold = 3
 
 // ============== REMOTE PATHS ==============
-const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/development/" // TODO: update to main branch when merging
+const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/main/"
 const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
 // ============== LIST/RULES MANAGEMENT ==============
