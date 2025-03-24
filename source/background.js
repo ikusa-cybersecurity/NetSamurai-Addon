@@ -32,11 +32,13 @@ let globalWhitelist = [];
 let syncWhitelist = false; // Has to be marked as true to sync whitelist with local storage
 let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
 
+let addonResourceCleaningActive = true; // Addon button
 let offsetHashlist = {};
 
 const unbreakRulesActive = true;
 let reUnbreakRules; // RegExp
 
+let addonPaywallBlockingActive = true; // Addon button 
 const paywallRulesActive = true;
 let rePaywallRules; // RegExp
 
@@ -394,7 +396,7 @@ browser.webRequest.onBeforeRequest.addListener(
             }
         }
         // Check if the resource is identified as paywall or comes from paywall providers 
-        if (paywallRulesActive && isPaywall(auxURL.href)) {
+        if (addonPaywallBlockingActive && paywallRulesActive && isPaywall(auxURL.href)) {
             console.log(auxURL.href + " blocked due to paywall restrictions!");
             return {cancel: true};
         }
@@ -406,6 +408,10 @@ browser.webRequest.onBeforeRequest.addListener(
                 return {cancel: true};
             }
         }
+
+        // Check if addon has resource cleaning disabled. We need to check it after paywall, in case
+        // user wants to keep paywall blocking functionality withouth resource cleaning active.
+        if (!addonResourceCleaningActive) {return;}
 
         // CONTENT BLOCKER
         let filterReq = browser.webRequest.filterResponseData(details.requestId);
@@ -596,6 +602,22 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (tabsInfo.has(current_tab)) {
                 sendResponse([tabsInfo.get(current_tab).totalCookies, tabsInfo.get(current_tab).trackingCookies]);
             }
+            break;
+
+        case 'get_paywall_blocking':
+            sendResponse(addonPaywallBlockingActive);
+            break;
+        
+        case 'paywallCheck':
+            addonPaywallBlockingActive = request.data;
+            break;
+        
+        case 'get_resource_cleaning':
+            sendResponse(addonResourceCleaningActive);
+            break;
+        
+        case 'resourceCheck':
+            addonResourceCleaningActive = request.data;
             break;
     }
     //this is to prevent error message "Unchecked runtime.lastError: The message port closed before a response was received." from appearing needlessly

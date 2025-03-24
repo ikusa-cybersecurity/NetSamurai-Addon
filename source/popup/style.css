@@ -316,3 +316,37 @@ input:checked + .slider:after {
     max-height: 250px;
     overflow-y: auto;
 }
+
+.feature-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 20px;
+}
+
+.switch.small {
+    width: 40px;
+    height: 20px;
+}
+
+.switch.small .slider:before {
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+}
+
+.switch.small input:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+/* Remove the ON/OFF text for small switches */
+.switch.small .slider:after {
+    content: none;
+}
+
+.feature-toggle .text1 {
+    font-size: 14px;
+}

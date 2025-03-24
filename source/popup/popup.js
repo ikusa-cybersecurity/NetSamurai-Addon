@@ -151,7 +151,7 @@ function renderPopup(){
         }
         else {
             domain.innerHTML = "undefined";
-            summary.style.display = "none";
+            summary.style.display = "block";
             blockedUrls.style.display = "none";
         }
     });
@@ -160,7 +160,7 @@ function renderPopup(){
 
 function renderHomePage() {
     browser.runtime.sendMessage({method: 'get_blocked_urls'}, function(response) {
-        if (response && response.length > 0) {
+        if (response && response.length >= 0) {
             let blockedUrls = document.getElementById("blocked_urls");
             let parsedData = organizeBlockedHostUrls(response);
             parsedData.forEach (function(value, key) {
@@ -207,6 +207,22 @@ function checkEnabled() {
     });
     onoffButton.addEventListener('change', function () {
         browser.runtime.sendMessage({method: 'filterCheck', data: onoffButton.checked});
+    });
+
+    paywallButton = document.getElementById('paywallButton');
+    browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
+        paywallButton.checked = response;
+    });
+    paywallButton.addEventListener('change', function () {
+        browser.runtime.sendMessage({method: 'paywallCheck', data: paywallButton.checked});
+    });
+
+    resourceButton = document.getElementById('resourceButton');
+    browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
+        resourceButton.checked = response;
+    });
+    resourceButton.addEventListener('change', function () {
+        browser.runtime.sendMessage({method: 'resourceCheck', data: resourceButton.checked});
     });
 }
 
