@@ -202,28 +202,73 @@ function renderHomePage() {
 
 function checkEnabled() {
     onoffButton = document.getElementById('onoffButton');
+    paywallButton = document.getElementById('paywallButton');
+    resourceButton = document.getElementById('resourceButton');
+
     browser.runtime.sendMessage({method: 'get_enabled'}, function (response) {
         onoffButton.checked = response;
-    });
-    onoffButton.addEventListener('change', function () {
-        browser.runtime.sendMessage({method: 'filterCheck', data: onoffButton.checked});
+    
+        /* If user has disabled the extension (on/off slider), the other buttons must also
+         * be disabled and non-responsive. Otherwise 
+        */
+        if (!response) {
+            updateButtonState(paywallButton, false);
+            updateButtonState(resourceButton, false);
+            paywallButton.style.opacity = '0.5';
+            resourceButton.style.opacity = '0.5';
+            paywallButton.style.cursor = 'not-allowed';
+            resourceButton.style.cursor = 'not-allowed';
+        } else {
+            paywallButton.style.opacity = '1';
+            resourceButton.style.opacity = '1';
+            paywallButton.style.cursor = 'pointer';
+            resourceButton.style.cursor = 'pointer';
+            
+            browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
+                updateButtonState(paywallButton, response);
+            });
+            browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
+                updateButtonState(resourceButton, response);
+            });
+        }
     });
 
-    paywallButton = document.getElementById('paywallButton');
-    browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
-        updateButtonState(paywallButton, response);
+    // Add event listeners
+    onoffButton.addEventListener('change', function () {
+        let isEnabled = onoffButton.checked;
+        browser.runtime.sendMessage({method: 'filterCheck', data: isEnabled});
+        
+        if (!isEnabled) {
+            updateButtonState(paywallButton, false);
+            updateButtonState(resourceButton, false);
+            paywallButton.style.opacity = '0.5';
+            resourceButton.style.opacity = '0.5';
+            paywallButton.style.cursor = 'not-allowed';
+            resourceButton.style.cursor = 'not-allowed';
+        } else {
+            paywallButton.style.opacity = '1';
+            resourceButton.style.opacity = '1';
+            paywallButton.style.cursor = 'pointer';
+            resourceButton.style.cursor = 'pointer';
+
+            browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
+                updateButtonState(paywallButton, response);
+            });
+            browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
+                updateButtonState(resourceButton, response);
+            });
+        }
     });
+
     paywallButton.addEventListener('click', function () {
+        if (!onoffButton.checked) return;
         let newState = !paywallButton.classList.contains('enabled');
         updateButtonState(paywallButton, newState);
         browser.runtime.sendMessage({method: 'paywallCheck', data: newState});
     });
 
-    resourceButton = document.getElementById('resourceButton');
-    browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
-        updateButtonState(resourceButton, response);
-    });
     resourceButton.addEventListener('click', function () {
+        if (!onoffButton.checked) return;
         let newState = !resourceButton.classList.contains('enabled');
         updateButtonState(resourceButton, newState);
         browser.runtime.sendMessage({method: 'resourceCheck', data: newState});
