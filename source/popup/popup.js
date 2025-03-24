@@ -211,19 +211,33 @@ function checkEnabled() {
 
     paywallButton = document.getElementById('paywallButton');
     browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
-        paywallButton.checked = response;
+        updateButtonState(paywallButton, response);
     });
-    paywallButton.addEventListener('change', function () {
-        browser.runtime.sendMessage({method: 'paywallCheck', data: paywallButton.checked});
+    paywallButton.addEventListener('click', function () {
+        let newState = !paywallButton.classList.contains('enabled');
+        updateButtonState(paywallButton, newState);
+        browser.runtime.sendMessage({method: 'paywallCheck', data: newState});
     });
 
     resourceButton = document.getElementById('resourceButton');
     browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
-        resourceButton.checked = response;
+        updateButtonState(resourceButton, response);
     });
-    resourceButton.addEventListener('change', function () {
-        browser.runtime.sendMessage({method: 'resourceCheck', data: resourceButton.checked});
+    resourceButton.addEventListener('click', function () {
+        let newState = !resourceButton.classList.contains('enabled');
+        updateButtonState(resourceButton, newState);
+        browser.runtime.sendMessage({method: 'resourceCheck', data: newState});
     });
+}
+
+function updateButtonState(button, enabled) {
+    if (enabled) {
+        button.classList.add('enabled');
+        button.textContent = 'enabled';
+    } else {
+        button.classList.remove('enabled');
+        button.textContent = 'disabled';
+    }
 }
 
 // Run our script as soon as the document's DOM is ready.
@@ -265,6 +279,9 @@ document.addEventListener('DOMContentLoaded', function () {
         browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
         window.close();
     });
+
+    const manifest = browser.runtime.getManifest();
+    document.getElementById('version').textContent = 'v' + manifest.version;
 });
 
 renderPopup();

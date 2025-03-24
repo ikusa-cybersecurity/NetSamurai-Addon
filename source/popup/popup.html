@@ -47,18 +47,12 @@
                 <span class="text1">(</span><h3 id="num_unique">0</h3><span class="text1"> unique)</span>
                 <br><br>
                 <div class="feature-toggle">
-                    <span class="text1">Paywall Blocking</span>
-                    <label class="switch small">
-                        <input type="checkbox" id="paywallButton" name="paywallButton" value="On">
-                        <div class="slider round"></div>
-                    </label>
+                    <span class="text1"><b>Paywall Blocking</b></span>
+                    <button id="paywallButton" class="toggle-button">disabled</button>
                 </div>
                 <div class="feature-toggle">
-                    <span class="text1">Resource Cleaning</span>
-                    <label class="switch small">
-                        <input type="checkbox" id="resourceButton" name="resourceButton" value="On">
-                        <div class="slider round"></div>
-                    </label>
+                    <span class="text1"><b>Resource Cleaning</b></span>
+                    <button id="resourceButton" class="toggle-button">disabled</button>
                 </div>
             </div>
             <div id="blocked_urls" class="blocked-urls-div" align="middle">
@@ -76,5 +70,6 @@
             <button id="report_button" class="image-button change-opacity report-button" title="Report Broken Webpage"></button>
             <button id="refresh_button" class="image-button change-opacity refresh-button" title="Refresh Webpage"></button>
         </div>
+        <div id="version" class="version-text">v1.0.0</div>
   </body>
 </html>
