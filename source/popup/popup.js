@@ -18,6 +18,7 @@
 let unique_amount = 0;
 let total_amount = 0;
 
+let showingCleanUrls = false;  // Track which view is currently shown
 
 function organizeBlockedHostUrls(data) {
     // resultData => {hostname: [[url, times_replaced], ...]}
@@ -146,7 +147,7 @@ function renderPopup(){
         if (response) {
             domain.innerHTML = response;
             summary.style.display = "block";
-            blockedUrls.style.display = "block";
+            blockedUrls.style.display = "none";
         }
         else {
             domain.innerHTML = "undefined";
@@ -213,15 +214,25 @@ function checkEnabled() {
 document.addEventListener('DOMContentLoaded', function () {
     checkEnabled();
 
+    document.getElementById("cleanurls_button").addEventListener("click", function() {
+        let summary = document.getElementById("substituted_summary");
+        let blockedUrls = document.getElementById("blocked_urls");
+        if (showingCleanUrls) {
+            // Switch to summary view
+            summary.style.display = "block";
+            blockedUrls.style.display = "none";
+        } else {
+            // Switch to cleaned URLs view
+            summary.style.display = "none";
+            blockedUrls.style.display = "block";
+        }
+        showingCleanUrls = !showingCleanUrls;
+    });
     document.getElementById("home_button").addEventListener("click", function () {
         browser.tabs.create({url: "https://ikusa.tech/"});
     });
     document.getElementById("settings_button").addEventListener("click", function() {
         browser.runtime.sendMessage({method:'options_page'}, function(response){});
-        window.close();
-    });
-    document.getElementById("refresh_button").addEventListener("click", function() {
-        browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
         window.close();
     });
     document.getElementById("report_button").addEventListener("click", function() {
@@ -234,9 +245,9 @@ document.addEventListener('DOMContentLoaded', function () {
             browser.tabs.create({url: mailtoUrl});
         });
     });
-    document.getElementById("cleanurls_button").addEventListener("click", function() {
-        // browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
-        // window.close();
+    document.getElementById("refresh_button").addEventListener("click", function() {
+        browser.runtime.sendMessage({method:'reload_tab'}, function(response){});
+        window.close();
     });
 });
 
