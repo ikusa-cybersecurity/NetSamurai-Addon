@@ -29,7 +29,6 @@ const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie
 
 // ============== LIST/RULES MANAGEMENT ==============
 let globalWhitelist = [];
-let syncWhitelist = false; // Has to be marked as true to sync whitelist with local storage
 let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
 
 let addonResourceCleaningActive = true; // Addon button
@@ -371,11 +370,6 @@ browser.webRequest.onBeforeRequest.addListener(
             console.debug("Allowed by unbreak list: " + request_url);
             return;
         }
-        // Check if there's changes to the global whitelist and has to be synchronized with storage
-        if (syncWhitelist) {
-            browser.storage.local.set({globalWhitelist});
-            syncWhitelist = false;
-        }
         // Check global permanent whitelist
         for (let key in globalWhitelist) {
             if (auxURL.href.includes(globalWhitelist[key])) {
@@ -554,7 +548,7 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let atw_idx = globalWhitelist.indexOf(request.data);
             if (atw_idx === -1) {
                 globalWhitelist.push(request.data);
-                syncWhitelist = true;
+                browser.storage.local.set({globalWhitelist});
                 browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
             }
             console.debug("add_to_whitelist -> " + request.data);
@@ -565,7 +559,7 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let rfw_idx = globalWhitelist.indexOf(request.data);
             if (rfw_idx !== -1) {
                 globalWhitelist.splice(rfw_idx, 1);
-                syncWhitelist = true;
+                browser.storage.local.set({globalWhitelist});
                 browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
             }
             console.debug("remove_from_whitelist -> " + request.data);
