@@ -24,25 +24,31 @@
   </head>
   <body>
         <div id="title" class="title_div">
-            <div align="middle">
+            <div class="logo-container">
                 <img class="logo" src="../icons/logo.png" alt="NetSamurai" width="250" height="50">
-                <div class="features-container">
-                    <div class="feature-toggle">
-                        <span class="text1"><b>Paywall Blocking</b></span>
+            </div>
+            <table class="header-table">
+                <tr>
+                    <td class="feature-label">
+                        <span class="text1"><b>Paywall<br>Blocking</b></span>
+                    </td>
+                    <td class="switch-cell">
                         <label class="switch small">
                             <input type="checkbox" id="paywallButton">
                             <div class="slider round"></div>
                         </label>
-                    </div>
-                    <div class="feature-toggle">
-                        <span class="text1"><b>Resource Cleaning</b></span>
+                    </td>
+                    <td class="feature-label">
+                        <span class="text1"><b>Resource<br>Cleaning</b></span>
+                    </td>
+                    <td class="switch-cell">
                         <label class="switch small">
                             <input type="checkbox" id="resourceButton">
                             <div class="slider round"></div>
                         </label>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </table>
         </div>
         <div id="home_container" class="grey_container">
             <div id="top_data" class="domain_div" align="middle">
@@ -50,11 +56,11 @@
             </div>
             <div id="substituted_summary" align="middle">
                 <br>
-                <span class="text1">Cookies found for this url</span><br>
+                <span class="text1">Cookies found: </span>
                 <h3 id="total_cookies">0</h3><span class="text1"> total</span>
                 <span class="text1">(</span><h3 id="tracking_cookies">0</h3><span class="text1"> tracking)</span>
                 <br><br>
-                <span class="text1">Resources cleaned on this page</span><br>
+                <span class="text1">Resources cleaned: </span>
                 <h3 id="num_total">0</h3><span class="text1"> total</span>
                 <span class="text1">(</span><h3 id="num_unique">0</h3><span class="text1"> unique)</span>
                 <br><br>
