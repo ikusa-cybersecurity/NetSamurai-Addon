@@ -80,9 +80,9 @@ function createHostUrlStructure(hostname, data) {
     };
 
     const buttonsCell = document.createElement("td");
-    buttonsCell.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist"]));
-    buttonsCell.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist"]));
-    buttonsCell.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist"]));
+    buttonsCell.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
+    buttonsCell.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
+    buttonsCell.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
     buttonsCell.className = "buttons-cell"
 
     const buttonsRow = document.createElement("tr");

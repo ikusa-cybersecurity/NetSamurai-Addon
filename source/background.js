@@ -549,7 +549,6 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (atw_idx === -1) {
                 globalWhitelist.push(request.data);
                 browser.storage.local.set({globalWhitelist});
-                browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
             }
             console.debug("add_to_whitelist -> " + request.data);
             console.debug(globalWhitelist);
@@ -560,7 +559,6 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (rfw_idx !== -1) {
                 globalWhitelist.splice(rfw_idx, 1);
                 browser.storage.local.set({globalWhitelist});
-                browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
             }
             console.debug("remove_from_whitelist -> " + request.data);
             console.debug(globalWhitelist);
@@ -572,7 +570,6 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 if (attw_idx === -1) {
                     tabsInfo.get(current_tab).tmpWhitelist.push(request.data);
                     tabTmpWhitelist[current_tab] = tabsInfo.get(current_tab).tmpWhitelist;
-                    browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
                 }
             }
             console.debug("add_to_tmp_whitelist -> " + request.data);
@@ -585,7 +582,6 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 if (rftw_idx !== -1) {
                     tabsInfo.get(current_tab).tmpWhitelist.splice(rftw_idx, 1);
                     tabTmpWhitelist[current_tab] = tabsInfo.get(current_tab).tmpWhitelist;
-                    browser.tabs.executeScript(current_tab, {code: "window.location.reload();"});
                 }
             }
             console.debug("remove_from_tmp_whitelist -> " + request.data);
