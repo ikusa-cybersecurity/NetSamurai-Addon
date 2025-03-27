@@ -1,19 +1,40 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="container">
-            <div align="middle">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://ikusa.tech/" target="_blank">
                 <img class="logo" src="../icons/logo.png" alt="NetSamurai Addon" width="375" height="75">
-                <hr> 
-                <h2>Security by Privacy.</h2>
-                <img class="logo" src="../icons/logo-ikusa.png" alt="Ikusa Cybersecurity" width="130" height="50">
-                <p>Learn more about <a href="https://ikusa.tech/">Ikusa Cybersecurity</a>!</p>
-                <p>info@ikusa.tech</p>
+            </a>
+        </div>
+        <div class="whitelist-section">
+            <h2>User whitelist</h2>
+            <div class="whitelist-controls">
+                <input type="text" id="newDomain" placeholder="Enter domain to whitelist">
+                <button id="addDomain">Add Domain</button>
+            </div>
+            <div class="whitelist-container">
+                <ul id="whitelistItems"></ul>
             </div>
         </div>
-    </body>
+        <div class="footer">
+            <div class="footer-text">
+                <h3>Security by Privacy.</h3>
+            </div>
+            <div class="footer-logos">
+                <a href="https://www.ikusa.tech" target="_blank">
+                    <img class="logo" src="../icons/logo-ikusa.png" alt="Ikusa Cybersecurity" width="130" height="50">
+                </a>
+            </div>
+            <div class="footer-contact">
+                <p>Contact: <a href="mailto:info@ikusa.tech">info@ikusa.tech</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
 </html>
