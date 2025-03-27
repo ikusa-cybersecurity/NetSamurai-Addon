@@ -231,13 +231,11 @@ input:checked + .slider:after {
 }
 
 .small-button {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background-color: #444546;
-    /*margin: 0 1px;*/
-    margin-bottom: 2px;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin: 0;
+    padding: 0;
     display: inline-block;
 }
 
@@ -257,9 +255,11 @@ input:checked + .slider:after {
 }
 
 .hostname-cell-right {
-    font-size: 14px;
-    text-align: right;
-    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    min-width: 120px;
 }
 
 .hostname-cell-left {
@@ -317,27 +317,37 @@ input:checked + .slider:after {
     overflow-y: auto;
 }
 
+.features-container {
+    padding: 5px 10px;
+}
+
 .feature-toggle {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 8px 20px;
+    margin: 5px 0;
 }
 
-.toggle-button {
-    padding: 4px 8px;
-    border-radius: 5px;
-    border: none;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #EB3C3C;
-    transition: background-color 0.4s;
+.switch.small {
+    width: 46px;
+    height: 20px;
 }
 
-.toggle-button.enabled {
-    background-color: #68885A;
+.switch.small .slider:before {
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+}
+
+.switch.small input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.switch.small .slider:after {
+    font-size: 10px;
 }
 
 .version-text {
@@ -346,4 +356,17 @@ input:checked + .slider:after {
     right: 4px;
     font-size: 9px;
     opacity: 0.5;
+}
+
+.whitelist-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+}
+
+.resource-amount {
+    font-size: 14px;
+    min-width: 30px;
+    text-align: right;
 }

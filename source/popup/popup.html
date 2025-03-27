@@ -26,10 +26,22 @@
         <div id="title" class="title_div">
             <div align="middle">
                 <img class="logo" src="../icons/logo.png" alt="NetSamurai" width="250" height="50">
-                <label class="switch">
-                    <input type="checkbox" id="onoffButton" name="onoffButton" value="On">
-                    <div class="slider round"></div>
-                </label>
+                <div class="features-container">
+                    <div class="feature-toggle">
+                        <span class="text1"><b>Paywall Blocking</b></span>
+                        <label class="switch small">
+                            <input type="checkbox" id="paywallButton">
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
+                    <div class="feature-toggle">
+                        <span class="text1"><b>Resource Cleaning</b></span>
+                        <label class="switch small">
+                            <input type="checkbox" id="resourceButton">
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="home_container" class="grey_container">
@@ -46,25 +58,10 @@
                 <h3 id="num_total">0</h3><span class="text1"> total</span>
                 <span class="text1">(</span><h3 id="num_unique">0</h3><span class="text1"> unique)</span>
                 <br><br>
-                <div class="feature-toggle">
-                    <span class="text1"><b>Paywall Blocking</b></span>
-                    <button id="paywallButton" class="toggle-button">disabled</button>
-                </div>
-                <div class="feature-toggle">
-                    <span class="text1"><b>Resource Cleaning</b></span>
-                    <button id="resourceButton" class="toggle-button">disabled</button>
-                </div>
             </div>
-            <div id="blocked_urls" class="blocked-urls-div" align="middle">
-                <div id="blocked_urls_title">
-                    <br>
-                    <span class="text1"><i>Resources cleaned by NetSamurai:</i></span>
-                    <br><br>
-                </div>
-            </div>
+            <div id="blocked_urls" class="blocked-urls-div" align="middle"></div>
         </div>
         <div class="button-container">
-            <button id="cleanurls_button" class="image-button change-opacity cleanurls-button" title="Toggle Cleaned URLs View"></button>
             <button id="home_button" class="image-button change-opacity home-button" title="Visit Homepage"></button>
             <button id="settings_button" class="image-button change-opacity settings-button" title="Open Settings"></button>
             <button id="report_button" class="image-button change-opacity report-button" title="Report Broken Webpage"></button>

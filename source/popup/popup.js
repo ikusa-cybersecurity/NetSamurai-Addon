@@ -18,8 +18,6 @@
 let unique_amount = 0;
 let total_amount = 0;
 
-let showingCleanUrls = false;  // Track which view is currently shown
-
 function organizeBlockedHostUrls(data) {
     // resultData => {hostname: [[url, times_replaced], ...]}
     let resultData = new Map();
@@ -79,20 +77,8 @@ function createHostUrlStructure(hostname, data) {
         return button;
     };
 
-    const buttonsCell = document.createElement("td");
-    buttonsCell.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
-    buttonsCell.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
-    buttonsCell.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
-    buttonsCell.className = "buttons-cell"
-
-    const buttonsRow = document.createElement("tr");
-    buttonsRow.appendChild(buttonsCell);
-
-    const buttonsTable = document.createElement("table");
-    buttonsTable.appendChild(buttonsRow);
-
+    // Create URL table
     const hostUrlTable = document.createElement("table");
-
     for (let i = 0; i < data.length; i++) {
         const row = document.createElement("tr");
         const urlCell = document.createElement("td");
@@ -113,9 +99,20 @@ function createHostUrlStructure(hostname, data) {
         hostnameResourceAmount += data[i][1];
     }
 
-    // Right cell
+    // Right cell - now contains buttons + resource amount
+    const buttonsSpan = document.createElement("span");
+    buttonsSpan.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
+    buttonsSpan.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
+    buttonsSpan.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
+    buttonsSpan.className = "whitelist-buttons";
+
     let resAmount = (hostnameResourceAmount === 0) ? "allowed" : hostnameResourceAmount.toString();
-    hostnameCellRight.textContent = resAmount;
+    const resAmountSpan = document.createElement("span");
+    resAmountSpan.textContent = resAmount;
+    resAmountSpan.className = "resource-amount";
+
+    hostnameCellRight.appendChild(buttonsSpan);
+    hostnameCellRight.appendChild(resAmountSpan);
     hostnameCellRight.className = "hostname-cell-right";
 
     // Left cell
@@ -129,7 +126,6 @@ function createHostUrlStructure(hostname, data) {
     hostSummary.appendChild(hostnameTable);
     hostSummary.className = "host-summary";
     hostDetails.appendChild(hostSummary);
-    hostDetails.appendChild(buttonsTable)
     hostDetails.appendChild(hostUrlTable);
 
     hostUrlTable.className = "host-url-table";
@@ -147,7 +143,7 @@ function renderPopup(){
         if (response) {
             domain.innerHTML = response;
             summary.style.display = "block";
-            blockedUrls.style.display = "none";
+            blockedUrls.style.display = "block";
         }
         else {
             domain.innerHTML = "undefined";
@@ -201,108 +197,33 @@ function renderHomePage() {
 
 
 function checkEnabled() {
-    onoffButton = document.getElementById('onoffButton');
     paywallButton = document.getElementById('paywallButton');
     resourceButton = document.getElementById('resourceButton');
 
-    browser.runtime.sendMessage({method: 'get_enabled'}, function (response) {
-        onoffButton.checked = response;
+    browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
+        paywallButton.checked = response;
+    });
     
-        /* If user has disabled the extension (on/off slider), the other buttons must also
-         * be disabled and non-responsive. Otherwise 
-        */
-        if (!response) {
-            updateButtonState(paywallButton, false);
-            updateButtonState(resourceButton, false);
-            paywallButton.style.opacity = '0.5';
-            resourceButton.style.opacity = '0.5';
-            paywallButton.style.cursor = 'not-allowed';
-            resourceButton.style.cursor = 'not-allowed';
-        } else {
-            paywallButton.style.opacity = '1';
-            resourceButton.style.opacity = '1';
-            paywallButton.style.cursor = 'pointer';
-            resourceButton.style.cursor = 'pointer';
-            
-            browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
-                updateButtonState(paywallButton, response);
-            });
-            browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
-                updateButtonState(resourceButton, response);
-            });
-        }
+    browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
+        resourceButton.checked = response;
     });
 
     // Add event listeners
-    onoffButton.addEventListener('change', function () {
-        let isEnabled = onoffButton.checked;
-        browser.runtime.sendMessage({method: 'filterCheck', data: isEnabled});
-        
-        if (!isEnabled) {
-            updateButtonState(paywallButton, false);
-            updateButtonState(resourceButton, false);
-            paywallButton.style.opacity = '0.5';
-            resourceButton.style.opacity = '0.5';
-            paywallButton.style.cursor = 'not-allowed';
-            resourceButton.style.cursor = 'not-allowed';
-        } else {
-            paywallButton.style.opacity = '1';
-            resourceButton.style.opacity = '1';
-            paywallButton.style.cursor = 'pointer';
-            resourceButton.style.cursor = 'pointer';
-
-            browser.runtime.sendMessage({method: 'get_paywall_blocking'}, function (response) {
-                updateButtonState(paywallButton, response);
-            });
-            browser.runtime.sendMessage({method: 'get_resource_cleaning'}, function (response) {
-                updateButtonState(resourceButton, response);
-            });
-        }
+    paywallButton.addEventListener('change', function () {
+        let isEnabled = paywallButton.checked;
+        browser.runtime.sendMessage({method: 'paywallCheck', data: isEnabled});
     });
 
-    paywallButton.addEventListener('click', function () {
-        if (!onoffButton.checked) return;
-        let newState = !paywallButton.classList.contains('enabled');
-        updateButtonState(paywallButton, newState);
-        browser.runtime.sendMessage({method: 'paywallCheck', data: newState});
+    resourceButton.addEventListener('change', function () {
+        let isEnabled = resourceButton.checked;
+        browser.runtime.sendMessage({method: 'resourceCheck', data: isEnabled});
     });
-
-    resourceButton.addEventListener('click', function () {
-        if (!onoffButton.checked) return;
-        let newState = !resourceButton.classList.contains('enabled');
-        updateButtonState(resourceButton, newState);
-        browser.runtime.sendMessage({method: 'resourceCheck', data: newState});
-    });
-}
-
-function updateButtonState(button, enabled) {
-    if (enabled) {
-        button.classList.add('enabled');
-        button.textContent = 'enabled';
-    } else {
-        button.classList.remove('enabled');
-        button.textContent = 'disabled';
-    }
 }
 
 // Run our script as soon as the document's DOM is ready.
 document.addEventListener('DOMContentLoaded', function () {
     checkEnabled();
 
-    document.getElementById("cleanurls_button").addEventListener("click", function() {
-        let summary = document.getElementById("substituted_summary");
-        let blockedUrls = document.getElementById("blocked_urls");
-        if (showingCleanUrls) {
-            // Switch to summary view
-            summary.style.display = "block";
-            blockedUrls.style.display = "none";
-        } else {
-            // Switch to cleaned URLs view
-            summary.style.display = "none";
-            blockedUrls.style.display = "block";
-        }
-        showingCleanUrls = !showingCleanUrls;
-    });
     document.getElementById("home_button").addEventListener("click", function () {
         browser.tabs.create({url: "https://ikusa.tech/"});
     });
