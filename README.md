@@ -18,7 +18,5 @@ Some icons and buttons are available in _flaticon.com_:
 - `Open Settings` - <a href="https://www.flaticon.com/free-icons/settings" title="settings icons">Settings icons created by Freepik - Flaticon</a>
 - `Report Broken Webpage` - <a href="https://www.flaticon.com/free-icons/google-talk" title="google talk icons">Google talk icons created by Icon Mela - Flaticon</a>
 - `Refresh Webpage` - <a href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Dave Gandy - Flaticon</a>
-- `Delete from whitelist` - <a href="https://www.flaticon.com/free-icons/forbidden" title="forbidden icons">Forbidden icons created by Freepik - Flaticon</a>
-- `Add to whitelist` - <a href="https://www.flaticon.com/free-icons/bookmark" title="bookmark icons">Bookmark icons created by Freepik - Flaticon</a> 
-- `Add to temporal whitelist` - <a href="https://www.flaticon.com/free-icons/clock" title="clock icons">Clock icons created by Freepik - Flaticon</a> 
+- `Delete from whitelist`, `Add to whitelist`, `Add to temporal whitelist` - Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 

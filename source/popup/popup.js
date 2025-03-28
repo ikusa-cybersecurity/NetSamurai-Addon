@@ -88,9 +88,10 @@ function createHostUrlStructure(hostname, data) {
         let displayUrl = (data[i][1] >= 3) ? ("** " + data[i][0]) : data[i][0];
 
         urlCell.textContent = truncateUrl(displayUrl);
-        urlCell.style.width = "270px";
+        urlCell.style.width = "95%";
         timesCell.textContent = data[i][1];
-        timesCell.style.width = "30px";
+        timesCell.style.width = "5%";
+        timesCell.style.textAlign = "right";
 
         row.appendChild(urlCell);
         row.appendChild(timesCell);
