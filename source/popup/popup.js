@@ -43,7 +43,7 @@ function truncateUrl(str) {
 }
 
 function truncateDomain(str) {
-    const size = 32;
+    const size = 26; //32
     if (str.length <= size) {
         return str;
     }

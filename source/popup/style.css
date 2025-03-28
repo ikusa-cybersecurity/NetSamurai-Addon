@@ -31,8 +31,8 @@ h4 {
 }
 
 body {
-    min-width: 450px;
-    max-width: 475px;
+    min-width: 350px;
+    max-width: 400px;
     max-height: 600px;
     font-size: 12px;
     margin: 0;
@@ -42,9 +42,7 @@ body {
 
 div.title_div {
     margin: 5px;
-    position: relative;
-    text-align: center;
-    display: inline;
+    padding: 5px;
 }
 
 div.grey_container {
@@ -72,6 +70,10 @@ span.text1 {
     font-size: 14px;
 }
 
+span.text-header {
+    font-size: 16px;
+}
+
 span.text2 {
     display: block;
     font-size: 14px;
@@ -83,6 +85,12 @@ span.text_msg {
     margin-left: 20px;
     margin-right: 20px;
     font-size: 15px;
+    font-style: italic;
+}
+
+span.domain {
+    font-size: 17px;
+    font-weight: bold;
     font-style: italic;
 }
 
@@ -108,15 +116,15 @@ th {
     font-size: 14px;
     border-bottom: 1px solid #C3C3C3;
 }
+
 img.logo {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 5px;
+    /*margin-bottom: 5px;*/
     /*margin-left: 20px;
     float: left;*/
 }
-
 
 input.unfoldBtn {
     background-color: #ffa800;
@@ -321,7 +329,7 @@ input:checked + .slider:after {
 .blocked-urls-div {
     flex: 1;
     overflow-y: auto;
-    min-height: 100px;
+    /*min-height: 100px;*/
     max-height: calc(580px - 300px);
     scrollbar-width: thin;
 }
@@ -336,28 +344,35 @@ input:checked + .slider:after {
     margin-bottom: 10px;
 }
 
-.logo-container {
+.logo-cell {
+    width: 250px;
+    /*padding: 5px;*/
+    vertical-align: middle;
     text-align: center;
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
 }
 
 .logo {
     display: block;
-    margin: 0 auto;
     width: 250px;
-    height: 50px;
+    height: auto;
+    /*width: 250px;
+    height: 50px;*/
+    /*margin: 0 auto;*/
 }
 
 .feature-label {
     text-align: center;
-    padding: 0 5px;
+    /*padding: 10px;*/
+    padding-bottom: 5px;
     white-space: nowrap;
     vertical-align: middle;
-    width: 25%;
+    width: 50%;
 }
 
 .switch-cell {
-    width: 25%;
+    width: 50%;
+    padding: 10px;
     text-align: center;
     padding: 0 5px;
     vertical-align: middle;
