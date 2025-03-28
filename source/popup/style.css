@@ -31,7 +31,7 @@ h4 {
 }
 
 body {
-    min-width: 350px;
+    min-width: 375px;
     max-width: 400px;
     max-height: 600px;
     font-size: 12px;
@@ -339,17 +339,18 @@ input:checked + .slider:after {
 }
 
 .header-table {
-    width: 100%;
+    width: 90%;
     border-collapse: collapse;
-    margin-bottom: 10px;
+    position: relative;
+    margin: 0 auto;
 }
 
-.logo-cell {
+.logo-container {
     width: 250px;
     /*padding: 5px;*/
     vertical-align: middle;
     text-align: center;
-    /*margin-bottom: 10px;*/
+    margin-bottom: 10px;
 }
 
 .logo {
@@ -367,11 +368,11 @@ input:checked + .slider:after {
     padding-bottom: 5px;
     white-space: nowrap;
     vertical-align: middle;
-    width: 50%;
+    width: 25%;
 }
 
 .switch-cell {
-    width: 50%;
+    width: 25%;
     padding: 10px;
     text-align: center;
     padding: 0 5px;
