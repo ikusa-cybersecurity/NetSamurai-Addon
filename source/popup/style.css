@@ -396,11 +396,13 @@ input:checked + .slider:after {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
+    margin-left: 5px;
 }
 
 .resource-amount {
-    font-size: 14px;
-    min-width: 30px;
+    font-size: 12px;
+    /*min-width: 10%;*/
     text-align: right;
+    vertical-align: middle;
 }

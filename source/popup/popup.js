@@ -89,10 +89,11 @@ function createHostUrlStructure(hostname, data) {
 
         urlCell.textContent = truncateUrl(displayUrl);
         urlCell.style.width = "95%";
-        timesCell.textContent = data[i][1];
-        timesCell.style.width = "5%";
-        timesCell.style.textAlign = "right";
+        const timesCellSpan = document.createElement("span")
+        timesCellSpan.textContent = data[i][1];
+        timesCellSpan.className = "resource-amount";
 
+        timesCell.appendChild(timesCellSpan);
         row.appendChild(urlCell);
         row.appendChild(timesCell);
         hostUrlTable.appendChild(row);
@@ -112,8 +113,8 @@ function createHostUrlStructure(hostname, data) {
     resAmountSpan.textContent = resAmount;
     resAmountSpan.className = "resource-amount";
 
-    hostnameCellRight.appendChild(buttonsSpan);
     hostnameCellRight.appendChild(resAmountSpan);
+    hostnameCellRight.appendChild(buttonsSpan);
     hostnameCellRight.className = "hostname-cell-right";
 
     // Left cell
