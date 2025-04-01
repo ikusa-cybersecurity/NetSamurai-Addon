@@ -463,31 +463,53 @@ browser.webRequest.onBeforeRequest.addListener(
 
 // ############################################## TABS LISTENERS ##############################################
 let current_tab;
-//on activated tab, creates new tabInfo if tab visited is not registered
-browser.tabs.onActivated.addListener(
-    function(activeInfo){
-        current_tab = activeInfo.tabId;
-        if (tabsInfo.has(activeInfo.tabId)){
-            return;
+
+function setCurrentTab(tabs) {
+    current_tab = tabs[0].id;
+}
+
+function currentTabError(error) {
+    console.error(`Error: ${error}`);
+}
+
+browser.tabs.query({ currentWindow: true, active: true }).then(setCurrentTab, currentTabError);
+
+//on removed, remove tabInfo when a tab is closed
+browser.tabs.onCreated.addListener(
+    function(tab){
+        console.error("onCreated for tab.id " + tab.id);
+        if(!tabsInfo.has(tab.id)){
+            newInfo(tab.id);
+            console.error("Initialized structure for " + tab.id);
         }
-        newInfo(activeInfo.tabId);
-        // console.debug(tabsInfo);
     }
 );
 
+//on activated tab, creates new tabInfo if tab visited is not registered
+browser.tabs.onActivated.addListener(
+    function(activeInfo){
+        console.error("onActivated for tabId " + activeInfo.tabId);
+        current_tab = activeInfo.tabId;
+        if (!tabsInfo.has(activeInfo.tabId)){
+            newInfo(activeInfo.tabId);
+            console.error("Initialized structure for " + activeInfo.tabId);
+        }
+    }
+);
 
 //on updated tab, creates new tabInfo when page is reloaded or url is changed
 browser.tabs.onUpdated.addListener(
     function(tabId, changeInfo){
+        console.error("onUpdated for tabId " + tabId);
         if ((changeInfo.url !== undefined) && tabsInfo.has(tabId)){
             newInfo(tabId);
+            console.error("Re-Initialized (redirect|refresh) structure for " + tabId);
             browser.browserAction.setBadgeText(
                 {tabId: tabId, text: ('')}
             );
         }
     }
 );
-
 
 //on removed, remove tabInfo when a tab is closed
 browser.tabs.onRemoved.addListener(
@@ -522,6 +544,11 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             break;
 
         case 'get_current_domain':
+            //if (current_tab === undefined) {
+            //    let auxtab = await browser.tabs.query({currentWindow: true, active: true});
+            //    current_tab = auxtab[0].id;
+            //}
+            //console.error("get_current_domain -> current_tab: " + current_tab);
             if (tabsInfo.has(current_tab)){
                 sendResponse(tabsInfo.get(current_tab).host);
             }
