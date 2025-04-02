@@ -254,6 +254,11 @@ input:checked + .slider:after {
     opacity: 0.9;
 }
 
+.not-clickable {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .buttons-cell {
     width: 300px;
     text-align: center;

@@ -64,16 +64,20 @@ function createHostUrlStructure(hostname, data) {
     hostnameHeading.textContent = truncateDomain(hostname);
     let hostnameResourceAmount = 0;
 
-    const createButton = (className, buttonTitle, messageMethods) => {
+    const createButton = (isClickable, className, buttonTitle, messageMethods) => {
         const button = document.createElement('button');
-        button.classList.add("image-button", "small-button", "change-opacity", className);
         button.title = buttonTitle;
-        button.addEventListener('click', () => {
-            for (messageMethod of messageMethods) {
-                browser.runtime.sendMessage({ method: messageMethod, data: hostname });
-            }
-            window.close();
-        });
+        if (isClickable) {
+            button.classList.add("image-button", "small-button", "change-opacity", className);
+            button.addEventListener('click', () => {
+                for (messageMethod of messageMethods) {
+                    browser.runtime.sendMessage({ method: messageMethod, data: hostname });
+                }
+                window.close();
+            });
+        } else {
+            button.classList.add("image-button", "small-button", "not-clickable", className);
+        }
         return button;
     };
 
@@ -103,9 +107,12 @@ function createHostUrlStructure(hostname, data) {
 
     // Right cell - now contains buttons + resource amount
     const buttonsSpan = document.createElement("span");
-    buttonsSpan.appendChild(createButton("del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
-    buttonsSpan.appendChild(createButton("add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
-    buttonsSpan.appendChild(createButton("tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
+    // Whenever a domain is in the whitelist, only the delete button can be clicked and not the other ones. If it is not whitelisted
+    // it can only be added, not deleted.
+    const isInWhitelist = (hostnameResourceAmount === 0);
+    buttonsSpan.appendChild(createButton(isInWhitelist, "del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
+    buttonsSpan.appendChild(createButton(!isInWhitelist, "add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
+    buttonsSpan.appendChild(createButton(!isInWhitelist, "tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
     buttonsSpan.className = "whitelist-buttons";
 
     let resAmount = (hostnameResourceAmount === 0) ? "allowed" : hostnameResourceAmount.toString();
