@@ -30,6 +30,7 @@ const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie
 // ============== LIST/RULES MANAGEMENT ==============
 let globalWhitelist = [];
 let tabTmpWhitelist = [] // EXPERIMENTAL - save tmpWhitelist when reloading
+let debugWhitelist = [];
 
 let addonResourceCleaningActive = true; // Addon button
 let offsetHashlist = {};
@@ -213,7 +214,7 @@ function newInfo (tabId){
                     url: tab.url,
                     host: auxHost,
                     baseHost: getBaseHost(auxHost),
-                    substitutedUrls: [], // array of {url: x, host: y, times: z}
+                    substitutedUrls: [], // array of {url: x, host: y, times: z, hash: h}
                     totalSubstituted: 0, // Total number of substituted resources
                     bytesLoadedDefault: 0, // Total size of loaded resources without cleaner
                     bytesLoadedClean: 0, // Size of loaded clean resources
@@ -243,7 +244,7 @@ function getBaseHost(auxHost) {
     return baseHost;
 }
 
-function updateTabInfo (idTab, auxUrl, bytesDefault, bytesClean){
+function updateTabInfo (idTab, auxUrl, bytesDefault, bytesClean, resourceHash){
     const auxUrlArray = tabsInfo.get(idTab).substitutedUrls;
     let urlFound = false;
     for (let index = 0; !urlFound && index < auxUrlArray.length; index++) {
@@ -259,7 +260,8 @@ function updateTabInfo (idTab, auxUrl, bytesDefault, bytesClean){
         tabsInfo.get(idTab).substitutedUrls.push({
             url: auxUrl.href,
             host: auxUrl.host,
-            times: 1
+            times: 1,
+            hash: resourceHash
         });
     }
 
@@ -275,7 +277,7 @@ function updateTabInfo (idTab, auxUrl, bytesDefault, bytesClean){
     );
 }
 
-function updateTabInfoWhitelist(idTab, auxUrl) {
+function updateTabInfoWhitelist(idTab, auxUrl, resourceHash) {
     const auxUrlArray = tabsInfo.get(idTab).substitutedUrls;
     let urlFound = false;
     for (let index = 0; !urlFound && index < auxUrlArray.length; index++) {
@@ -287,7 +289,8 @@ function updateTabInfoWhitelist(idTab, auxUrl) {
         tabsInfo.get(idTab).substitutedUrls.push({
             url: auxUrl.href,
             host: auxUrl.host,
-            times: 0
+            times: 0,
+            hash: resourceHash
         });
     }
 }
@@ -373,7 +376,7 @@ browser.webRequest.onBeforeRequest.addListener(
         // Check global permanent whitelist
         for (let key in globalWhitelist) {
             if (auxURL.href.includes(globalWhitelist[key])) {
-                updateTabInfoWhitelist(idTab, auxURL);
+                updateTabInfoWhitelist(idTab, auxURL, '[userWhitelist] n/a hash');
                 console.debug("Allowed by global whitelist: " + request_url);
                 return;
             }
@@ -384,7 +387,7 @@ browser.webRequest.onBeforeRequest.addListener(
             // console.log("Checking " + auxURL.href + " against tmp whitelist:");
             // console.log(auxTmpWhitelist);
             if (auxURL.href.includes(auxTmpWhitelist[key])) {
-                updateTabInfoWhitelist(idTab, auxURL);
+                updateTabInfoWhitelist(idTab, auxURL, '[userWhitelist] n/a hash');
                 console.debug("Allowed by tab whitelist: " + request_url);
                 return;
             }
@@ -421,6 +424,13 @@ browser.webRequest.onBeforeRequest.addListener(
             let data = await new Response(auxBlob).arrayBuffer();
 
             let hash = await hash_func(data);
+
+            if (debugWhitelist.includes(hash)) {
+                updateTabInfoWhitelist(idTab, auxURL, hash);
+                console.error(`Allowed by DEBUG whitelist:\n    ${request_url}\n    ${hash}`);
+                return;
+            }
+
             let isTracking = offsetHashlist.hasOwnProperty(hash);
 
             if (isTracking) { // Has to be blocked
@@ -443,7 +453,7 @@ browser.webRequest.onBeforeRequest.addListener(
 
                 // Add info to tabInfo
                 let auxURL = await new URL(request_url);
-                await updateTabInfo(details.tabId, auxURL, data.byteLength, new_data.byteLength);
+                await updateTabInfo(details.tabId, auxURL, data.byteLength, new_data.byteLength, hash);
                 await writeFilter(filterReq, new_data);
             }
             else {
@@ -477,10 +487,8 @@ browser.tabs.query({ currentWindow: true, active: true }).then(setCurrentTab, cu
 //on removed, remove tabInfo when a tab is closed
 browser.tabs.onCreated.addListener(
     function(tab){
-        console.error("onCreated for tab.id " + tab.id);
         if(!tabsInfo.has(tab.id)){
             newInfo(tab.id);
-            console.error("Initialized structure for " + tab.id);
         }
     }
 );
@@ -488,11 +496,9 @@ browser.tabs.onCreated.addListener(
 //on activated tab, creates new tabInfo if tab visited is not registered
 browser.tabs.onActivated.addListener(
     function(activeInfo){
-        console.error("onActivated for tabId " + activeInfo.tabId);
         current_tab = activeInfo.tabId;
         if (!tabsInfo.has(activeInfo.tabId)){
             newInfo(activeInfo.tabId);
-            console.error("Initialized structure for " + activeInfo.tabId);
         }
     }
 );
@@ -500,10 +506,8 @@ browser.tabs.onActivated.addListener(
 //on updated tab, creates new tabInfo when page is reloaded or url is changed
 browser.tabs.onUpdated.addListener(
     function(tabId, changeInfo){
-        console.error("onUpdated for tabId " + tabId);
         if ((changeInfo.url !== undefined) && tabsInfo.has(tabId)){
             newInfo(tabId);
-            console.error("Re-Initialized (redirect|refresh) structure for " + tabId);
             browser.browserAction.setBadgeText(
                 {tabId: tabId, text: ('')}
             );
@@ -635,6 +639,24 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         
         case 'resourceCheck':
             addonResourceCleaningActive = request.data;
+            break;
+
+        case 'add_debug_whitelist':
+            let adw_idx = debugWhitelist.indexOf(request.data);
+            if (adw_idx === -1) {
+                debugWhitelist.push(request.data);
+            }
+            console.error("add_debug_whitelist -> " + request.data);
+            console.error(debugWhitelist);
+            break;
+
+        case 'remove_debug_whitelist':
+            let rdw_idx = debugWhitelist.indexOf(request.data);
+            if (rdw_idx !== -1) {
+                debugWhitelist.splice(rdw_idx, 1);
+            }
+            console.error("remove_debug_whitelist -> " + request.data);
+            console.error(debugWhitelist);
             break;
     }
     //this is to prevent error message "Unchecked runtime.lastError: The message port closed before a response was received." from appearing needlessly

@@ -19,14 +19,14 @@ let unique_amount = 0;
 let total_amount = 0;
 
 function organizeBlockedHostUrls(data) {
-    // resultData => {hostname: [[url, times_replaced], ...]}
+    // resultData => {hostname: [[url, times_replaced, hash], ...]}
     let resultData = new Map();
     for (let i = 0; i < data.length; i++) {
         if (resultData.has(data[i].host)) {
-            resultData.get(data[i].host).push([data[i].url, data[i].times]);
+            resultData.get(data[i].host).push([data[i].url, data[i].times, data[i].hash]);
         }
         else {
-            resultData.set(data[i].host, [[data[i].url, data[i].times]]);
+            resultData.set(data[i].host, [[data[i].url, data[i].times, data[i].hash]]);
         }
         total_amount += data[i].times;
     }
@@ -64,14 +64,14 @@ function createHostUrlStructure(hostname, data) {
     hostnameHeading.textContent = truncateDomain(hostname);
     let hostnameResourceAmount = 0;
 
-    const createButton = (isClickable, className, buttonTitle, messageMethods) => {
+    const createButton = (isClickable, className, buttonTitle, messageMethods, messageData) => {
         const button = document.createElement('button');
         button.title = buttonTitle;
         if (isClickable) {
             button.classList.add("image-button", "small-button", "change-opacity", className);
             button.addEventListener('click', () => {
                 for (messageMethod of messageMethods) {
-                    browser.runtime.sendMessage({ method: messageMethod, data: hostname });
+                    browser.runtime.sendMessage({ method: messageMethod, data: messageData });
                 }
                 window.close();
             });
@@ -91,12 +91,16 @@ function createHostUrlStructure(hostname, data) {
         // Add '**' in front of the urls from the resources that are being hardBlocked for spamming
         let displayUrl = (data[i][1] >= 3) ? ("** " + data[i][0]) : data[i][0];
 
-        urlCell.textContent = truncateUrl(displayUrl);
-        urlCell.style.width = "95%";
+        //urlCell.textContent = truncateUrl(displayUrl);
+        urlCell.innerText = truncateUrl(displayUrl) + '\n' + data[i][2];
+        urlCell.style.width = "70%";
         const timesCellSpan = document.createElement("span")
-        timesCellSpan.textContent = data[i][1];
+        timesCellSpan.textContent = (data[i][1] === 0) ? "allowed" : data[i][1].toString();
         timesCellSpan.className = "resource-amount";
 
+        const isUrlInWhitelist = (data[i][1] === 0);
+        timesCell.appendChild(createButton(isUrlInWhitelist, "del-whitelist-button", "Delete from whitelist [DEBUG]", ["remove_debug_whitelist", "reload_tab"], data[i][2]));
+        timesCell.appendChild(createButton(!isUrlInWhitelist, "add-whitelist-button", "Add to whitelist [DEBUG]", ["add_debug_whitelist", "reload_tab"], data[i][2]));
         timesCell.appendChild(timesCellSpan);
         row.appendChild(urlCell);
         row.appendChild(timesCell);
@@ -110,9 +114,9 @@ function createHostUrlStructure(hostname, data) {
     // Whenever a domain is in the whitelist, only the delete button can be clicked and not the other ones. If it is not whitelisted
     // it can only be added, not deleted.
     const isInWhitelist = (hostnameResourceAmount === 0);
-    buttonsSpan.appendChild(createButton(isInWhitelist, "del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"]));
-    buttonsSpan.appendChild(createButton(!isInWhitelist, "add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"]));
-    buttonsSpan.appendChild(createButton(!isInWhitelist, "tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"]));
+    buttonsSpan.appendChild(createButton(isInWhitelist, "del-whitelist-button", "Delete from whitelist", ["remove_from_whitelist", "remove_from_tmp_whitelist", "reload_tab"], hostname));
+    buttonsSpan.appendChild(createButton(!isInWhitelist, "add-whitelist-button", "Add to whitelist", ["add_to_whitelist", "reload_tab"], hostname));
+    buttonsSpan.appendChild(createButton(!isInWhitelist, "tmp-whitelist-button", "Add to temporal whitelist", ["add_to_tmp_whitelist", "reload_tab"], hostname));
     buttonsSpan.className = "whitelist-buttons";
 
     let resAmount = (hostnameResourceAmount === 0) ? "allowed" : hostnameResourceAmount.toString();

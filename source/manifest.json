@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "NetSamurai",
-  "version": "1.3.0",
+  "version": "1.3.0-debugging",
 
   "description": "Block tracking code shared accross multiple resources.",
   "homepage_url": "https://ikusa.tech/",
