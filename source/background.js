@@ -41,6 +41,9 @@ let addonPaywallBlockingActive = true; // Addon button
 const paywallRulesActive = true;
 let rePaywallRules; // RegExp
 
+let totalCleanedResources = 0; // Global counter for all cleaned resources
+let lastSyncedCount = 0; // Track last synced count
+
 // #################### ADDON INITIALIZATION ####################
 async function initializeAddon() {
     try {
@@ -55,6 +58,11 @@ async function initializeAddon() {
         if (cookieDBEnabled) {
             await loadTrackingCookiesDB();
         }
+        // Load the total cleaned resources counter
+        let stored = await browser.storage.local.get("totalCleanedResources");
+        totalCleanedResources = stored.totalCleanedResources || 0;
+        lastSyncedCount = totalCleanedResources;
+        console.debug("Loaded total cleaned resources count:", totalCleanedResources);
         console.debug("Addon initialization completed successfully");
     } catch (e) {
         console.error("Error during addon initialization:", e);
@@ -441,6 +449,9 @@ browser.webRequest.onBeforeRequest.addListener(
                 // TODO: Check why so many new_data.legth come as undefined despite the algorithm working
                 //console.debug("(Replaced: " + hash + " | size " + originalDataView.length + " -> " + new_data.length + " )");
 
+                // Just increment the counter, sync will happen periodically
+                totalCleanedResources++;
+                
                 // Add info to tabInfo
                 let auxURL = await new URL(request_url);
                 await updateTabInfo(details.tabId, auxURL, data.byteLength, new_data.byteLength);
@@ -636,7 +647,56 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case 'resourceCheck':
             addonResourceCleaningActive = request.data;
             break;
+
+        case 'get_total_cleaned':
+            sendResponse(totalCleanedResources);
+            break;
     }
     //this is to prevent error message "Unchecked runtime.lastError: The message port closed before a response was received." from appearing needlessly
     sendResponse();
+});
+
+
+// ############################################## CLEANED RESOURCES COUNT SYNC ##############################################
+
+// Replace the existing sync implementation with this more robust version
+async function syncCleanedCount() {
+    if (totalCleanedResources !== lastSyncedCount) {
+        try {
+            await browser.storage.local.set({ totalCleanedResources });
+            lastSyncedCount = totalCleanedResources;
+            console.debug("Synced cleaned resources count:", totalCleanedResources);
+        } catch (e) {
+            console.error("Failed to sync cleaned resources count:", e);
+        }
+    }
+}
+
+// Use more reliable events for syncing
+browser.tabs.onRemoved.addListener(() => {
+    syncCleanedCount();
+});
+
+browser.windows.onRemoved.addListener(() => {
+    syncCleanedCount();
+});
+
+// Sync when the browser session is about to end
+browser.runtime.onSuspend.addListener(() => {
+    syncCleanedCount();
+});
+
+// Add periodic sync with error handling
+const SYNC_INTERVAL = 1 * 60 * 1000; // Sync every minute instead of 5
+setInterval(() => {
+    syncCleanedCount().catch(e => 
+        console.error("Periodic sync failed:", e)
+    );
+}, SYNC_INTERVAL);
+
+// Add visibility change listener to sync when tab becomes hidden
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        syncCleanedCount();
+    }
 });
