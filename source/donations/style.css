@@ -18,7 +18,7 @@ hr {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     background: #444546;
     padding: 20px;
@@ -26,35 +26,9 @@ hr {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.container2 {
-    margin-left: 45px;
-}
-
 .header {
     text-align: center;
     margin-bottom: 30px;
-}
-
-.header-top {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-}
-
-.donate-button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #68885A;
-    color: white;
-    text-decoration: none;
-    border-radius: 20px;
-    font-size: 14px;
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.donate-button:hover {
-    background-color: #5c7552;
-    transform: scale(1.05);
 }
 
 .header .logo {
@@ -62,33 +36,65 @@ hr {
     height: auto;
 }
 
-/* Whitelist */
-.whitelist-section {
+/* Donations Section */
+.donations-section {
     margin: 40px 0;
+    text-align: center;
 }
 
-h2 {
-    color: #ffffff;
-    margin-bottom: 20px;
+.donation-text {
+    margin: 20px auto;
+    max-width: 75%;
+    line-height: 1.6;
 }
 
-.whitelist-controls {
-    margin-bottom: 20px;
+.donation-options {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 30px;
 }
 
-#newDomain {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #404040;
+.donation-method {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 65%;
+}
+
+.donation-method h3 {
+    margin-top: 0;
+    color: #68885A;
+}
+
+.crypto-address {
+    margin: 20px 0;
+    padding: 10px;
+    background: #2a2a2a;
     border-radius: 4px;
-    background-color: #1a1a1a;
-    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-button {
-    padding: 8px 16px;
+.crypto-address p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.crypto-address code {
+    background: #3a3a3a;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.copy-btn {
+    padding: 5px 15px;
     background-color: #68885A;
     color: white;
     border: none;
@@ -96,45 +102,23 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+.copy-btn:hover {
     background-color: #5c7552;
 }
 
-.whitelist-container {
-    border: 1px solid #404040;
+.paypal-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #0070ba;
+    color: white;
+    text-decoration: none;
     border-radius: 4px;
-    padding: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: #1a1a1a;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
-#whitelistItems {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#whitelistItems li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid #404040;
-    color: #ffffff;
-}
-
-#whitelistItems li:last-child {
-    border-bottom: none;
-}
-
-.delete-btn {
-    background-color: #cf1b1b;
-    padding: 4px 8px;
-}
-
-.delete-btn:hover {
-    background-color: #a01515;
+.paypal-button:hover {
+    background-color: #005ea6;
 }
 
 /* Footer */
@@ -200,3 +184,31 @@ button:hover {
 ::-webkit-scrollbar-thumb:hover {
     background: #555555;
 }
+
+/* Stats Section */
+.stats-section {
+    margin: 20px 0 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-container {
+    background: #1a1a1a;
+    padding: 20px 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #68885A;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0.8;
+} 
