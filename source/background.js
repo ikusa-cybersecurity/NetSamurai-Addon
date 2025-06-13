@@ -24,7 +24,7 @@ let trackingCookies = [] // Extracted from the Open Cookie Database
 let hardBlockThreshold = 3
 
 // ============== REMOTE PATHS ==============
-const remoteBasePath = "https://raw.githubusercontent.com/ikusa-cybersecurity/NetSamurai-Addon/main/"
+const remoteBasePath = "https://grabber.ikusa.tech/";
 const openCookieDBPath = "https://raw.githubusercontent.com/jkwakman/Open-Cookie-Database/master/open-cookie-database.csv";
 
 // ============== LIST/RULES MANAGEMENT ==============
@@ -41,17 +41,42 @@ let addonPaywallBlockingActive = true; // Addon button
 const paywallRulesActive = true;
 let rePaywallRules; // RegExp
 
+// Cache for update.json data
+let updateData = null;
+
 // #################### ADDON INITIALIZATION ####################
+async function fetchUpdateData() {
+    if (updateData !== null) {
+        return updateData;
+    }
+    
+    try {
+        const response = await fetch(remoteBasePath + "update.json");
+        updateData = await response.json();
+        return updateData;
+    } catch (e) {
+        console.error("Error fetching update.json:", e);
+        return null;
+    }
+}
+
 async function initializeAddon() {
     try {
         await loadWhitelist();
-        await updateOffsetHashlist();
-        if (unbreakRulesActive) {
-            await updateUnbreakRules();
+        await fetchUpdateData();
+        
+        if (updateData !== null) {
+            await updateOffsetHashlist();
+            if (unbreakRulesActive) {
+                await updateUnbreakRules();
+            }
+            if (paywallRulesActive) {
+                await updatePaywallRules();
+            }
+        } else {
+            console.error("Failed to fetch update data, skipping list updates");
         }
-        if (paywallRulesActive) {
-            await updatePaywallRules();
-        }
+        
         if (cookieDBEnabled) {
             await loadTrackingCookiesDB();
         }
@@ -71,12 +96,27 @@ async function getRemoteList(list_url, storage_var) {
         // Get local hash from storage
         let localHashVar = storage_var + "Hash";
         let localHash = (await browser.storage.local.get(localHashVar))[localHashVar];
-        // Try to get remote hash
+        
+        // Get remote hash from updateData
         let remoteHash;
         try {
-            remoteHash = await (await fetch(list_url + ".sha256")).text();
+            // Find the list in updateData using the storage_var name
+            const listName = storage_var === "offsetHashlist" ? "netsamurai-offsets" :
+                           storage_var === "paywallRules" ? "netsamurai-paywalls" :
+                           storage_var === "unbreakRules" ? "netsamurai-unbreak" : null;
+            
+            if (!listName) {
+                throw new Error(`Unknown storage variable: ${storage_var}`);
+            }
+
+            const listInfo = updateData.lists.find(list => list.name === listName);
+            if (!listInfo) {
+                throw new Error(`List ${listName} not found in update.json`);
+            }
+
+            remoteHash = listInfo.hash;
         } catch (e) {
-            console.error(`Error fetching hash for ${storage_var}:`, e);
+            console.error(`Error getting hash for ${storage_var}:`, e);
             // If we can't get the remote hash, use existing data if available
             if (localHash !== undefined) {
                 return (await browser.storage.local.get(storage_var))[storage_var];
@@ -84,6 +124,7 @@ async function getRemoteList(list_url, storage_var) {
             // If no existing data, throw error to trigger fallback
             throw e;
         }
+
         // Update if no local data stored or if newer data is available
         if (localHash === undefined || localHash !== remoteHash) {
             console.debug(`${storage_var} local  : ${localHash}`);
@@ -128,7 +169,14 @@ async function getRemoteList(list_url, storage_var) {
 }
 
 async function updateOffsetHashlist() {
-    offsetHashlist = await getRemoteList(remoteBasePath + "lists/offsets/offsets.json", "offsetHashlist");
+    const listInfo = updateData.lists.find(list => list.name === "netsamurai-offsets");
+    if (!listInfo) {
+        console.error("netsamurai-offsets list not found in update.json");
+        offsetHashlist = {};
+        return;
+    }
+    
+    offsetHashlist = await getRemoteList(remoteBasePath + listInfo.path, "offsetHashlist");
     if (offsetHashlist === null) {
         console.error("Failed to load offsetHashlist! loaded empty list.");
         offsetHashlist = {};
@@ -136,7 +184,13 @@ async function updateOffsetHashlist() {
 }
 
 async function updatePaywallRules() {
-    let rawPaywallRules = await getRemoteList(remoteBasePath + "lists/rules/paywalls.json", "paywallRules");
+    const listInfo = updateData.lists.find(list => list.name === "netsamurai-paywalls");
+    if (!listInfo) {
+        console.error("netsamurai-paywalls list not found in update.json");
+        return;
+    }
+    
+    let rawPaywallRules = await getRemoteList(remoteBasePath + listInfo.path, "paywallRules");
     if (rawPaywallRules === null) {
         console.error("Failed to load paywallRules! paywallRules disabled.");
     } else {
@@ -146,7 +200,13 @@ async function updatePaywallRules() {
 function isPaywall(url) { return rePaywallRules.test(url); }
 
 async function updateUnbreakRules() {
-    let rawUnbreakRules = await getRemoteList(remoteBasePath + "lists/rules/unbreak.json", "unbreakRules");
+    const listInfo = updateData.lists.find(list => list.name === "netsamurai-unbreak");
+    if (!listInfo) {
+        console.error("netsamurai-unbreak list not found in update.json");
+        return;
+    }
+    
+    let rawUnbreakRules = await getRemoteList(remoteBasePath + listInfo.path, "unbreakRules");
     if (rawUnbreakRules === null) {
         console.error("Failed to load unbreakRules! unbreakRules disabled.");
     } else {
