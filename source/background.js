@@ -537,10 +537,8 @@ browser.tabs.query({ currentWindow: true, active: true }).then(setCurrentTab, cu
 //on removed, remove tabInfo when a tab is closed
 browser.tabs.onCreated.addListener(
     function(tab){
-        console.error("onCreated for tab.id " + tab.id);
         if(!tabsInfo.has(tab.id)){
             newInfo(tab.id);
-            console.error("Initialized structure for " + tab.id);
         }
     }
 );
@@ -548,11 +546,9 @@ browser.tabs.onCreated.addListener(
 //on activated tab, creates new tabInfo if tab visited is not registered
 browser.tabs.onActivated.addListener(
     function(activeInfo){
-        console.error("onActivated for tabId " + activeInfo.tabId);
         current_tab = activeInfo.tabId;
         if (!tabsInfo.has(activeInfo.tabId)){
             newInfo(activeInfo.tabId);
-            console.error("Initialized structure for " + activeInfo.tabId);
         }
     }
 );
@@ -560,10 +556,8 @@ browser.tabs.onActivated.addListener(
 //on updated tab, creates new tabInfo when page is reloaded or url is changed
 browser.tabs.onUpdated.addListener(
     function(tabId, changeInfo){
-        console.error("onUpdated for tabId " + tabId);
         if ((changeInfo.url !== undefined) && tabsInfo.has(tabId)){
             newInfo(tabId);
-            console.error("Re-Initialized (redirect|refresh) structure for " + tabId);
             browser.browserAction.setBadgeText(
                 {tabId: tabId, text: ('')}
             );
