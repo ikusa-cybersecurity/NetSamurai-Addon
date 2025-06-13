@@ -47,9 +47,14 @@ let updateData = null;
 // #################### ADDON INITIALIZATION ####################
 async function fetchUpdateData() {
     if (updateData !== null) {
-        return updateData;
+        const expirationDate = new Date(updateData.expires);
+        const currentDate = new Date();
+        if (currentDate < expirationDate) {
+            console.debug("Cached update data not expired yet, loading cached data!");
+            return updateData;
+        }
+        console.debug("Cached update data is still valid");
     }
-    
     try {
         const response = await fetch(remoteBasePath + "update.json");
         updateData = await response.json();
