@@ -1,8 +1,0 @@
-{
-    "rules": [
-        "^https?:\\/\\/(www\\.)?(google\\.com|recaptcha\\.net|gstatic\\.com)\\/.*recaptcha.*",
-        "^https?:\\/\\/([a-z0-9.-]+\\.)?gstatic\\.com\\/.*$",
-        "^https?:\\/\\/docs\\.google\\.com\\/.*",
-        "^https?:\\/\\/.*jquery.*$"
-    ]
-}
