@@ -641,6 +641,11 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             browser.runtime.openOptionsPage();
             break;
 
+        case 'donations_page':
+            const donationsPageUrl = browser.runtime.getURL("donations/donations.html");
+            browser.tabs.create({ url: donationsPageUrl });
+            break;
+
         case 'add_to_whitelist':
             let atw_idx = globalWhitelist.indexOf(request.data);
             if (atw_idx === -1) {

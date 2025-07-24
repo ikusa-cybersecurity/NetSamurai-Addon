@@ -25,6 +25,14 @@
     "page": "options/options.html",
     "open_in_tab": true
   },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["donations/banner.js"],
+      "run_at": "document_end"
+    }
+  ],
 
   "background": {
     "scripts": ["background.js"]
