@@ -1,6 +1,7 @@
 * {
     color: white;
     font-family: system-ui, Roboto;
+    font-size: 16px;
 }
 
 body {
@@ -46,6 +47,12 @@ hr {
     margin: 20px auto;
     max-width: 75%;
     line-height: 1.6;
+    font-size: 18px;
+}
+
+.donation-text b {
+    color: #68885A;
+    font-weight: bold;
 }
 
 .donation-options {
@@ -67,6 +74,7 @@ hr {
 .donation-method h3 {
     margin-top: 0;
     color: #68885A;
+    font-size: 24px;
 }
 
 .crypto-address {
@@ -208,7 +216,7 @@ hr {
 }
 
 .stat-label {
-    font-size: 14px;
+    font-size: 16px;
     color: #ffffff;
     opacity: 0.8;
 } 
