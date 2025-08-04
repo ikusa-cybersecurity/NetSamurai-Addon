@@ -3,6 +3,10 @@
     const DONATION_BANNER_MILESTONE = 10; // Show banner every 1000 resources cleaned
     const FIRST_BANNER_DELAY_DAYS = 0; // Days to wait before showing banner for the first time
     
+    // Work hours restriction - avoid showing banner during work hours
+    const WORK_HOURS_START = 8; // 8:00 am
+    const WORK_HOURS_END = 16; // 4:00 pm (16:00h)
+    
     // Avoid injecting multiple times
     if (window.__netsamurai_donation_banner_injected) return;
     window.__netsamurai_donation_banner_injected = true;
@@ -133,6 +137,13 @@
     // Check if banner should be shown based on cleaned resources count and time since installation
     async function shouldShowBanner() {
         try {
+            // Check if current time and don't show banner during work hours
+            const now = new Date();
+            const currentHour = now.getHours();
+            if (currentHour >= WORK_HOURS_START && currentHour < WORK_HOURS_END) {
+                return false;
+            }
+            
             // Get total cleaned resources count from background script
             const response = await browser.runtime.sendMessage({ method: "get_total_cleaned" });
             const totalCleaned = response || 0;
