@@ -1,11 +1,11 @@
 (function() {
     // Configuration - Change this value to adjust when the banner appears
-    const DONATION_BANNER_MILESTONE = 10; // Show banner every 1000 resources cleaned
-    const FIRST_BANNER_DELAY_DAYS = 0; // Days to wait before showing banner for the first time
+    const DONATION_BANNER_MILESTONE = 10000; // Show banner every N resources cleaned
+    const FIRST_BANNER_DELAY_DAYS = 14; // Days to wait before showing banner for the first time
     
     // Work hours restriction - avoid showing banner during work hours
-    const WORK_HOURS_START = 8; // 8:00 am
-    const WORK_HOURS_END = 16; // 4:00 pm (16:00h)
+    const WORK_HOURS_START = 8; // 08.00h
+    const WORK_HOURS_END = 16;  // 16.00h
     
     // Avoid injecting multiple times
     if (window.__netsamurai_donation_banner_injected) return;
