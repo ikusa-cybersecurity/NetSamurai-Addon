@@ -1,6 +1,7 @@
 (function() {
     // Configuration - Change this value to adjust when the banner appears
     const DONATION_BANNER_MILESTONE = 10; // Show banner every 1000 resources cleaned
+    const FIRST_BANNER_DELAY_DAYS = 14; // Days to wait before showing banner for the first time
     
     // Avoid injecting multiple times
     if (window.__netsamurai_donation_banner_injected) return;
@@ -121,20 +122,32 @@
     // Insert style into head
     document.head.appendChild(style);
   
-    // Check if banner should be shown based on cleaned resources count
+    // Check if banner should be shown based on cleaned resources count and time since installation
     async function shouldShowBanner() {
         try {
+            // Get total cleaned resources count from background script
             const response = await browser.runtime.sendMessage({ method: "get_total_cleaned" });
             const totalCleaned = response || 0;
             
             // Get the last milestone when banner was shown
-            const storage = await browser.storage.local.get("lastDonationBannerMilestone");
+            const storage = await browser.storage.local.get(["lastDonationBannerMilestone", "extensionInstallDate"]);
             const lastMilestone = storage.lastDonationBannerMilestone || 0;
+            let installDate = storage.extensionInstallDate;
+            
+            if (!installDate) {
+                installDate = Date.now();
+                await browser.storage.local.set({ extensionInstallDate: installDate });
+                return false; // No banner on first run
+            }
+            
+            // Calculate days since installation and check if 14 days have passed since installation
+            const daysSinceInstall = (Date.now() - installDate) / (1000 * 60 * 60 * 24);
+            if (daysSinceInstall < FIRST_BANNER_DELAY_DAYS) {
+                return false;
+            }
             
             // Calculate the next milestone using the configurable threshold
             const nextMilestone = Math.floor(totalCleaned / DONATION_BANNER_MILESTONE) * DONATION_BANNER_MILESTONE;
-            
-            // Show banner if we've reached a new milestone and it's at least the threshold value
             if (nextMilestone >= DONATION_BANNER_MILESTONE && nextMilestone > lastMilestone) {
                 await browser.storage.local.set({ lastDonationBannerMilestone: nextMilestone });
                 return true;
