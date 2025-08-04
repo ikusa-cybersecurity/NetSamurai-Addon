@@ -1,7 +1,7 @@
 (function() {
     // Configuration - Change this value to adjust when the banner appears
     const DONATION_BANNER_MILESTONE = 10; // Show banner every 1000 resources cleaned
-    const FIRST_BANNER_DELAY_DAYS = 14; // Days to wait before showing banner for the first time
+    const FIRST_BANNER_DELAY_DAYS = 0; // Days to wait before showing banner for the first time
     
     // Avoid injecting multiple times
     if (window.__netsamurai_donation_banner_injected) return;
@@ -33,6 +33,18 @@
         </p>
         <a href="#" target="_blank" class="donations-banner-button">
           Support Privacy, Support NetSamurai
+        </a>
+      </div>
+      <span class="donations-banner-close" title="Close">&times;</span>
+      <div class="donations-banner-content">
+        <p class="donations-banner-text">
+          Protecting your digital life is an ongoing battle, as hidden trackers and data brokers are always evolving. 
+          <span class="green-bold">NetSamurai is the defense you need to safeguard your privacy.</span> By donating, 
+          you join our mission to <span class="green-bold">stay a step ahead</span>, ensuring NetSamurai remains a 
+          powerful shield <span class="green-bold">for everyone.</span>
+        </p>
+        <a href="#" target="_blank" class="donations-banner-button">
+          Support Our Mission
         </a>
       </div>
     `;
