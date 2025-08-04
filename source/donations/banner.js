@@ -1,4 +1,7 @@
 (function() {
+    // Configuration - Change this value to adjust when the banner appears
+    const DONATION_BANNER_MILESTONE = 10; // Show banner every 1000 resources cleaned
+    
     // Avoid injecting multiple times
     if (window.__netsamurai_donation_banner_injected) return;
     window.__netsamurai_donation_banner_injected = true;
@@ -118,23 +121,51 @@
     // Insert style into head
     document.head.appendChild(style);
   
-    // Insert banner into the middle of the body
-    function insertBanner() {
+    // Check if banner should be shown based on cleaned resources count
+    async function shouldShowBanner() {
+        try {
+            const response = await browser.runtime.sendMessage({ method: "get_total_cleaned" });
+            const totalCleaned = response || 0;
+            
+            // Get the last milestone when banner was shown
+            const storage = await browser.storage.local.get("lastDonationBannerMilestone");
+            const lastMilestone = storage.lastDonationBannerMilestone || 0;
+            
+            // Calculate the next milestone using the configurable threshold
+            const nextMilestone = Math.floor(totalCleaned / DONATION_BANNER_MILESTONE) * DONATION_BANNER_MILESTONE;
+            
+            // Show banner if we've reached a new milestone and it's at least the threshold value
+            if (nextMilestone >= DONATION_BANNER_MILESTONE && nextMilestone > lastMilestone) {
+                await browser.storage.local.set({ lastDonationBannerMilestone: nextMilestone });
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error("Error checking banner display condition:", error);
+            return false;
+        }
+    }
+  
+    async function insertBanner() {
         const body = document.body;
         if (!body) return;
         
+        const showBanner = await shouldShowBanner();
+        if (!showBanner) {
+            return;
+        }
+        
         body.insertBefore(banner, body.firstChild);
     
-        // Show banner with fade-in after 1 second
         setTimeout(() => {
             banner.style.display = 'block';
             setTimeout(() => {
-            banner.style.opacity = '1';
+                banner.style.opacity = '1';
             }, 10);
-        }, 2000);
+        }, 2000);  // fade-in 2 seconds
     }
   
-    // Wait for DOMContentLoaded if needed
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', insertBanner);
     } else {
@@ -149,7 +180,6 @@
       });
     }
 
-    // Add close functionality
     const closeBtn = banner.querySelector('.donations-banner-close');
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
