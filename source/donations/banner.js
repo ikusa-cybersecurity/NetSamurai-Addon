@@ -10,40 +10,36 @@
     // Create the banner container
     const banner = document.createElement('div');
     banner.id = 'donationsBannerIntegrated';
-    banner.style.display = 'none';
-    banner.style.textAlign = 'center';
-    banner.style.padding = '25px 20px';
-    banner.style.backgroundColor = '#2A2A2A';
-    banner.style.margin = '40px auto';
-    banner.style.maxWidth = '800px';
-    banner.style.boxSizing = 'border-box';
-    banner.style.borderRadius = '8px';
-    banner.style.opacity = '0';
-    banner.style.transition = 'opacity 0.5s ease-out';
+    banner.style.cssText = `
+        display: none !important;
+        text-align: center !important;
+        padding: 25px 20px !important;
+        background-color: #2A2A2A !important;
+        margin: 40px auto !important;
+        max-width: 800px !important;
+        box-sizing: border-box !important;
+        border-radius: 8px !important;
+        opacity: 0 !important;
+        transition: opacity 0.5s ease-out !important;
+        position: relative !important;
+        z-index: 999999 !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        color: #FFFFFF !important;
+        line-height: 1.6 !important;
+        font-size: 14px !important;
+    `;
   
-    // Banner inner HTML
+    // Banner inner HTML with aggressive inline styles
     banner.innerHTML = `
-      <span class="donations-banner-close" title="Close">&times;</span>
-      <div class="donations-banner-content">
-        <p class="donations-banner-text">
-          Your data is constantly exploited by hidden trackers and data brokers.
-          <span class="green-bold">NetSamurai offers cutting-edge protection</span> to safeguard your privacy.
-          By <span class="green-bold">donating</span>, you empower us to further develop NetSamurai,
-          <span class="green-bold">strengthening the very defenses that shield your digital life.</span>
-        </p>
-        <a href="#" target="_blank" class="donations-banner-button">
-          Support Privacy, Support NetSamurai
-        </a>
-      </div>
-      <span class="donations-banner-close" title="Close">&times;</span>
-      <div class="donations-banner-content">
-        <p class="donations-banner-text">
+      <span class="donations-banner-close" title="Close" style="position: absolute !important; top: 12px !important; right: 18px !important; font-size: 1.7em !important; color: #bbb !important; cursor: pointer !important; font-weight: bold !important; z-index: 10 !important; transition: color 0.2s !important;">&times;</span>
+      <div class="donations-banner-content" style="display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 15px !important;">
+        <p class="donations-banner-text" style="margin: 0 !important; font-size: 1.1em !important; text-align: center !important; color: #FFFFFF !important;">
           Protecting your digital life is an ongoing battle, as hidden trackers and data brokers are always evolving. 
-          <span class="green-bold">NetSamurai is the defense you need to safeguard your privacy.</span> By donating, 
-          you join our mission to <span class="green-bold">stay a step ahead</span>, ensuring NetSamurai remains a 
-          powerful shield <span class="green-bold">for everyone.</span>
+          <span class="green-bold" style="color: #68885A !important; font-weight: bold !important;">NetSamurai offers cutting-edge protection</span> to safeguard your privacy. 
+          By donating, you join our mission to <span class="green-bold" style="color: #68885A !important; font-weight: bold !important;">stay a step ahead</span>, ensuring NetSamurai 
+          remains a powerful shield <span class="green-bold" style="color: #68885A !important; font-weight: bold !important;">for everyone.</span>
         </p>
-        <a href="#" target="_blank" class="donations-banner-button">
+        <a href="#" target="_blank" class="donations-banner-button" style="display: inline-block !important; background-color: #68885A !important; color: #FFFFFF !important; padding: 12px 28px !important; border-radius: 8px !important; text-decoration: none !important; font-weight: bold !important; font-size: 1em !important; transition: background-color 0.3s ease, transform 0.2s ease !important; white-space: nowrap !important;">
           Support Our Mission
         </a>
       </div>
