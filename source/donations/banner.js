@@ -1,6 +1,6 @@
 (function() {
     // Configuration - Change this value to adjust when the banner appears
-    const DONATION_BANNER_MILESTONE = 10000; // Show banner every N resources cleaned
+    const DONATION_BANNER_MILESTONE = 1000; // Show banner every N resources cleaned
     const FIRST_BANNER_DELAY_DAYS = 14; // Days to wait before showing banner for the first time
     
     // Work hours restriction - avoid showing banner during work hours
